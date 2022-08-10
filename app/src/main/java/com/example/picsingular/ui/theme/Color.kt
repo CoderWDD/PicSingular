@@ -2,8 +2,13 @@ package com.example.picsingular.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val While = Color(0xFFFFFFFF)
+val White = Color(0xFFFFFFFF)
 val Grey200 = Color(0xFFF5F5F5)
-val Grey400 = Color(0xFF757575)
-val Teal200 = Color(0xFF03DAC5)
-val TextPrimaryColor = Color(0xFF000000)
+val Grey400 = Color(0xFFCCCACF)
+val Grey600 = Color(0xFF88838F)
+val Grey800 = Color(0xFF534f5a)
+val Grey900 = Color(0xFF13170b)
+val Black = Color(0xFF000000)
+val Red600 = Color(0xFFE53935)
+
+val LoginButtonBackground = Color(0x66AF2ED2)
