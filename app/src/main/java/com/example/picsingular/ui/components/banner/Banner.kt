@@ -48,6 +48,7 @@ fun Banner(
     LaunchedEffect(key1 = pagerState.currentPage) {
         delay(timeMillis)
         pagerState.animateScrollToPage((pagerState.currentPage + 1) % bannerSize)
+//        pagerState.scrollToPage((pagerState.currentPage + 1) % bannerSize)
     }
 
     Box(
@@ -144,7 +145,6 @@ fun Banner(
                                 .size(size)
                         )
                         if (i != bannerSize - 1) Spacer(modifier = Modifier.size(4.dp))
-
                     }
                 }
             }

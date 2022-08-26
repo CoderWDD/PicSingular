@@ -1,32 +1,49 @@
 package com.example.picsingular.ui.components.drawer
 
-import androidx.compose.foundation.Image
+import android.Manifest
+import android.content.ContentValues
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.picsingular.R
+import com.example.picsingular.common.utils.images.ImageUrlUtil
+import com.example.picsingular.common.utils.images.UriTofilePath
+import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.routes.NavRoutes
+import com.example.picsingular.ui.components.dialog.PicDialog
+import com.example.picsingular.ui.login.LoginViewAction
+import com.example.picsingular.ui.login.LoginViewModel
+import com.google.accompanist.permissions.*
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun Drawer(pageNavHostController: NavHostController) {
+fun Drawer(navHostController: NavHostController,scaffoldState: ScaffoldState,viewModel: LoginViewModel = hiltViewModel()) {
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    val albumPermissionsState = rememberMultiplePermissionsState(permissions = listOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+    val scope = rememberCoroutineScope()
     val textList = listOf("图床设置","PicSingular设置","关于PicSingular","退出")
     val iconList = listOf(
         R.drawable.bed_setting,
@@ -34,6 +51,47 @@ fun Drawer(pageNavHostController: NavHostController) {
         R.drawable.about,
         R.drawable.logout
     )
+    val drawerState = viewModel.viewState
+    val userInfo = drawerState.user
+    val avatarUrl = ImageUrlUtil.getAvatarUrl(drawerState.user?.username ?: "")
+    Log.e("wgw", "Drawer avatarUrl: $avatarUrl", )
+    Log.e("wgw", "Drawer userInfo: $userInfo", )
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
+    Log.e("wgw", "Drawer: $userInfo", )
+    PermissionRequired(
+        permissionState = cameraPermissionState,
+        permissionNotGrantedContent = { /*TODO*/ },
+        permissionNotAvailableContent = { /*TODO*/ }) {
+    }
+
+    PermissionsRequired(
+        multiplePermissionsState = albumPermissionsState,
+        permissionsNotGrantedContent = { /*TODO*/ },
+        permissionsNotAvailableContent = { /*TODO*/ }) {
+    }
+
+    // 打开相机的处理
+    val openCameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = {
+            if (it) {
+                imageUri.value = cameraUri
+                viewModel.intentHandler(LoginViewAction.UploadAvatar(cameraUri.toString()))
+            }
+        }
+    )
+
+    // 打开相册的处理
+    val openAlbumLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(), onResult = {
+        imageUri.value = it
+        val imagePath = UriTofilePath.getFilePathByUri(context, it)
+        viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))
+    })
+
+
     ConstraintLayout {
         val (column) = createRefs()
         Column(
@@ -51,26 +109,40 @@ fun Drawer(pageNavHostController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        // TODO 打开登录页面
-                        pageNavHostController.navigate(NavRoutes.Login.route)
+                        // navigate to login page
+                        NavHostUtil.navigateTo(
+                            navHostController = navHostController,
+                            destinationRouteName = NavRoutes.Login.route,
+                            singleTop = true
+                        )
+                        // close drawer
+                        scope.launch {
+                            scaffoldState.drawerState.close()
+                        }
                     }
                     .padding(top = 40.dp, bottom = 20.dp)
                     .clip(shape = RoundedCornerShape(8.dp))
-
             ) {
                 Spacer(modifier = Modifier.width(20.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.avatar),
+                AsyncImage(
+//                    if (imageUri.value == null) App.globalUserInfo?.avatar else ImageRequest.Builder(context = LocalContext.current).data(imageUri.value).crossfade(true).build()
+                    model = avatarUrl,
+                    placeholder = painterResource(id = R.drawable.avatar),
+                    error = painterResource(id = R.drawable.avatar),
                     contentDescription = "User Avatar",
                     modifier = Modifier
                         .clip(shape = CircleShape)
                         .size(80.dp)
+                        .clickable {
+                            showDialog = !showDialog
+                        }
                 )
                 Spacer(modifier = Modifier.width(20.dp))
                 Column (modifier = Modifier.align(Alignment.CenterVertically)) {
-                    Text(text = "请先登录", fontSize = 24.sp)
+                    Log.e("wgw", "Drawer: ${viewModel.viewState.user}", )
+                    Text(text = if (userInfo?.username.isNullOrEmpty()) "请先登录" else userInfo?.username!!, fontSize = 24.sp)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "登录后显示")
+                    Text(text = if (userInfo?.signature.isNullOrEmpty()) "这个人很懒，什么都没有留下" else userInfo?.signature!!, fontSize = 16.sp)
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -84,7 +156,9 @@ fun Drawer(pageNavHostController: NavHostController) {
             ){
                 for (i in textList.indices) {
                     DrawerItem(text = textList[i], icon = iconList[i],onClick = {
-
+                        if (i == 3){
+                            viewModel.intentHandler(LoginViewAction.Logout)
+                        }
                     })
                 }
             }
@@ -97,6 +171,33 @@ fun Drawer(pageNavHostController: NavHostController) {
         }
     }
 
+    if (showDialog) PicDialog(
+        onDismiss = {
+            showDialog = !showDialog
+        },
+        onCameraClick = {
+            showDialog = !showDialog
+            if (cameraPermissionState.hasPermission) {
+                cameraUri = context.contentResolver.insert(
+                    if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    else MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                    ContentValues()
+                )
+                Log.e("wgw", "Drawerwww: $cameraUri", )
+                openCameraLauncher.launch(cameraUri)
+            } else {
+                cameraPermissionState.launchPermissionRequest()
+            }
+        },
+        onAlbumClick = {
+            showDialog = !showDialog
+            if (albumPermissionsState.allPermissionsGranted){
+                openAlbumLauncher.launch("image/*")
+            }else {
+                albumPermissionsState.launchMultiplePermissionRequest()
+            }
+        }
+    )
 
 }
 

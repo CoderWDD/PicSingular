@@ -1,5 +1,6 @@
 package com.example.picsingular.common.utils.retrofit
 
+import com.example.picsingular.common.constants.HttpConstants
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import retrofit2.Retrofit
@@ -7,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object RetrofitClient {
-    private const val BASE_URL = "http://106.15.2.32:8806/"
+    private const val BASE_URL = HttpConstants.BASE_URL
 
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()

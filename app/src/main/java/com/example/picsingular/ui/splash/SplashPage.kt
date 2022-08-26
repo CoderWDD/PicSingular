@@ -1,20 +1,21 @@
 package com.example.picsingular.ui.splash
 
+import androidx.compose.foundation.background
 import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.example.picsingular.routes.NavRoutes
 
 @Composable
-fun SplashPage(navController: NavController){
+fun SplashPage(invokeFunction: () -> Unit){
+
     Button(
         onClick = {
-            navController.navigate(NavRoutes.Home.route){
-                // 每次跳转前都把原来的弹出，就可以实现返回直接退出了
-                navController.popBackStack()
-            }
+            invokeFunction()
         },
-
+        modifier = Modifier.background(color = Color.Black)
     ) {
 
     }

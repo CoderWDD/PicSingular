@@ -13,11 +13,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.picsingular.routes.NavRoutes
 import com.example.picsingular.ui.home.NavItem
 
 @Composable
-fun MyBottomBar(items: List<NavItem>, navController: NavHostController){
+fun MyBottomBar(items: List<NavItem>, navHostController: NavHostController){
     var selectedItem by remember { mutableStateOf(0) }
+
+    // find the current route and if it is not in the list of routes, just return
+    // this can make the bottom bar not work if the current route is not in the list of routes
+    val currentBackStackEntry = navHostController.currentBackStackEntryAsState()
+    val destination = currentBackStackEntry.value?.destination
+    val bottomNavRoutesList: List<String> = items.map { it.pageName }
+    if (!bottomNavRoutesList.contains(destination?.route)){
+        return
+    }
 
     BottomNavigation {
         items.forEachIndexed { index, item ->
@@ -27,9 +38,11 @@ fun MyBottomBar(items: List<NavItem>, navController: NavHostController){
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
-                    navController.navigate(item.pageName){
+                    navHostController.navigate(item.pageName){
                         // 每次跳转前都把原来的弹出，就可以实现返回直接退出了
-                        navController.popBackStack()
+                        navHostController.popBackStack()
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
                 label = { Text(text = item.itemName, color = Color.Black) },

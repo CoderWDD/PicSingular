@@ -1,10 +1,15 @@
 buildscript {
     ext {
         compose_ui_version = '1.2.0-beta01'
-        accompanistVersion = "0.19.0"
+        accompanistVersion = "0.23.1"
         constraintComposeVersion = "1.0.0-beta02"
         retrofitVersion = "2.9.0"
         okhttpVersion = "4.1.0"
+        hiltComposeVersion = "1.0.0"
+        hiltVersion = "2.42"
+        pagingVersion = "3.1.1"
+        pagingComposeVersion = "1.0.0-alpha15"
+        activityVersion = "1.5.1"
     }
     dependencies {
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
@@ -18,3 +23,4 @@ plugins {
     id 'com.android.library' version '7.4.0-alpha09' apply false
     id 'org.jetbrains.kotlin.android' version '1.6.21' apply false
 }
+
