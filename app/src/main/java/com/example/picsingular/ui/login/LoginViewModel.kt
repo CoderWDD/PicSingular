@@ -34,7 +34,12 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
             is LoginViewAction.UploadAvatar -> uploadAvatar(avatarPath = action.avatarPath)
             is LoginViewAction.GetUserInfo -> getUserInfo()
             is LoginViewAction.NavBack -> navBack(action.navHostController)
+            is LoginViewAction.InitData -> initData()
         }
+    }
+
+    private fun initData(){
+        viewState = viewState.copy(user = App.globalUserInfo)
     }
 
     private fun navBack(navHostController: NavHostController){
@@ -127,4 +132,5 @@ sealed class LoginViewAction{
     class UploadAvatar(val avatarPath: String) : LoginViewAction()
     object GetUserInfo : LoginViewAction()
     class NavBack(val navHostController: NavHostController) : LoginViewAction()
+    class InitData() : LoginViewAction()
 }

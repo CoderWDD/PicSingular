@@ -87,7 +87,6 @@ dependencies {
     // permission
     implementation "com.google.accompanist:accompanist-permissions:$accompanistVersion"
 
-
     // constraintLayout
     implementation "androidx.constraintlayout:constraintlayout-compose:$constraintComposeVersion"
 

@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Drawer(navHostController: NavHostController,scaffoldState: ScaffoldState,viewModel: LoginViewModel = hiltViewModel()) {
+    viewModel.intentHandler(LoginViewAction.InitData())
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val albumPermissionsState = rememberMultiplePermissionsState(permissions = listOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
     val scope = rememberCoroutineScope()
