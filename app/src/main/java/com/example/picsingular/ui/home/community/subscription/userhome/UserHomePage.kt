@@ -45,7 +45,7 @@ fun UserHomePage(
     viewModel.intentHandler(UserHomeViewAction.GetSingularListByUserId(userId = userData?.userId ?: -1L))
     Column(modifier = Modifier.fillMaxSize()) {
         SwipeRefreshList(lazyPagingItems = singularDataList, listState = listState){
-            val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userData?.username ?: "")
+            val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userData?.username ?: "", fileName = userData?.avatar ?: "")
             item {
                 ConstraintLayout(modifier = Modifier
                     .fillMaxWidth()

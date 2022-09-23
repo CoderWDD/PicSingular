@@ -26,7 +26,7 @@ fun CommentItem(
 ) {
     val commentFirstItemState = viewModel.commentFirstItemState
     val userInfo = commentFirstItemState.userInfo
-    val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "")
+    val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "", fileName = userInfo?.avatar ?: "")
 
     // 根据userId获取用户信息
     viewModel.intentHandler(CommentFirstItemAction.GetUserInfo(comment.userId))

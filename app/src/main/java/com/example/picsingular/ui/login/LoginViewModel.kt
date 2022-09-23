@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.picsingular.App
+import com.example.picsingular.AppAction
 import com.example.picsingular.bean.User
 import com.example.picsingular.common.constants.HttpConstants
 import com.example.picsingular.common.constants.TokenConstants
@@ -39,7 +40,7 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
     }
 
     private fun initData(){
-        viewState = viewState.copy(user = App.globalUserInfo)
+        viewState = viewState.copy(user = App.globalUserInfo.value)
     }
 
     private fun navBack(navHostController: NavHostController){
@@ -54,14 +55,13 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
             val file = File(avatarPath)
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
             val avatarFile = MultipartBody.Part.createFormData("avatar", filename = file.name, requestFile)
-            userRepository.uploadUserAvatar(avatar = avatarFile).collect{res ->
-                Log.e("wgw", "uploadAvatar: $res", )
-                if (res.status == HttpConstants.SUCCESS){
+            userRepository.uploadUserAvatar(avatar = avatarFile).collect{ res ->
+                viewState = if (res.status == HttpConstants.SUCCESS){
                     userRepository.saveUserToLocalStore(res.data)
-                    App.globalUserInfo = res.data
-                    viewState = viewState.copy(isSuccess = true, user = res.data)
+                    App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = res.data))
+                    viewState.copy(isSuccess = true, user = res.data)
                 }else {
-                    viewState = viewState.copy(isError = true, errorMessage = res.message)
+                    viewState.copy(isError = true, errorMessage = res.message)
                 }
             }
         }
@@ -70,24 +70,26 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
         userRepository.logout()
         TokenConstants.TOKEN = ""
         viewModelScope.launch { userRepository.removeTokenFromLocalStore() }
-        App.globalUserInfo = null
+        App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = null))
+        App.AppActionHandler(AppAction.UpdateLoginState(isLogin = false))
         viewState = viewState.copy(isLogin = false, user = null)
     }
 
     private fun login(username: String, password: String) {
         viewModelScope.launch {
             userRepository.login(username = username, password = password).collect{res ->
-                if (res.status == HttpConstants.SUCCESS){
+                viewState = if (res.status == HttpConstants.SUCCESS){
                     // if login success, then save the user to local storage
                     userRepository.saveUserToLocalStore(res.data)
                     // if login success, then save the token to shared preferences
                     userRepository.saveUserTokenToLocalStore(TokenConstants.TOKEN)
                     // save user to global variable
-                    App.globalUserInfo = res.data
+                    App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = res.data))
+                    App.AppActionHandler(AppAction.UpdateLoginState(isLogin = true))
                     // update the login status
-                    viewState = viewState.copy(isSuccess = true, isError = false, user = res.data, isLogin = true, navBack = true)
+                    viewState.copy(isSuccess = true, isError = false, user = res.data, isLogin = true, navBack = true)
                 }else {
-                    viewState = viewState.copy(isSuccess = false, isError = true, errorMessage = res.message, isLogin = false)
+                    viewState.copy(isSuccess = false, isError = true, errorMessage = res.message, isLogin = false)
                 }
             }
         }
@@ -99,7 +101,7 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
                 if (res.status == HttpConstants.SUCCESS){
                     // 将用户信息更新到本地
                     userRepository.saveUserToLocalStore(res.data)
-                    App.globalUserInfo = res.data
+                    App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = res.data))
                     Log.e("wgw", "getUserInfo: $viewState", )
                     viewState = viewState.copy(isSuccess = true, isError = false, user = res.data)
                 }else {

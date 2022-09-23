@@ -3,6 +3,10 @@ package com.example.picsingular
 import android.app.Application
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -20,7 +24,26 @@ import kotlin.coroutines.CoroutineContext
 class App: Application(){
 
     companion object{
-        var globalUserInfo: User? = null
+        var globalUserInfo: MutableState<User?> = mutableStateOf(null)
+        var isLogin: MutableState<Boolean> = mutableStateOf(false)
+        var appState by mutableStateOf(AppState())
+            private set
+
+        fun AppActionHandler(action: AppAction){
+            when (action){
+                is AppAction.UpdateUserInfo -> updateUserInfo(action.userInfo)
+                is AppAction.UpdateLoginState -> updateLoginState(action.isLogin)
+            }
+        }
+
+        private fun updateUserInfo(userInfo: User?){
+            appState = appState.copy(userInfo = userInfo)
+        }
+
+        private fun updateLoginState(isLogin: Boolean){
+            appState = appState.copy(isLogin = isLogin)
+        }
+
     }
 
     @Inject
@@ -36,4 +59,14 @@ class App: Application(){
             }
         }
     }
+}
+
+data class AppState(
+    val userInfo: User? = null,
+    val isLogin: Boolean = false
+)
+
+sealed class AppAction(){
+    class UpdateUserInfo(val userInfo: User?): AppAction()
+    class UpdateLoginState(val isLogin: Boolean): AppAction()
 }

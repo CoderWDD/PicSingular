@@ -110,7 +110,7 @@ fun SingularDetailPage(
                             .constrainAs(backIcon) {})
 
                         AsyncImage(
-                            model = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "loading..."),
+                            model = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "loading...", fileName = userInfo?.avatar ?: ""),
                             contentDescription = null,
                             placeholder = painterResource(id = R.drawable.avatar),
                             error = painterResource(id = R.drawable.avatar),
@@ -175,7 +175,7 @@ fun SingularDetailPage(
                                 .constrainAs(imageContainer) {}
                         ) {page ->
                             SubcomposeAsyncImage(
-                                model = ImageUrlUtil.getImageUrl(singularData.imageList?.get(page)?.imageUrl ?: "", singularId = singularData.singularId),
+                                model = ImageUrlUtil.getImageUrl(username = userInfo?.username ?: "", imageUrl = singularData.imageList?.get(page)?.imageUrl ?: ""),
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop

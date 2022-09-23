@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -47,8 +48,9 @@ fun RecommendPage(
                 }
                 )
             }
-            itemsIndexed(recommendPageDataList){ index, item ->
-                SingularItem(singularData = item!!, navHostController = navHostController)
+            itemsIndexed(recommendPageDataList){ _, item ->
+                SingularItem(singularData = item!!, navHostController = navHostController)  
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }

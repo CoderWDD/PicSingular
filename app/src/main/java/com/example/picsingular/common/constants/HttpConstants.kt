@@ -11,7 +11,7 @@ object HttpConstants {
 
     const val BASE_URL = "http://106.15.2.32:8806/"
 
-    const val BASE_IMAGE_URL = "http://106.15.2.32:8806/singular/image/"
+    const val BASE_IMAGE_URL = "http://106.15.2.32:8806/images/"
 
-    const val BASE_AVATAR_URL = "http://106.15.2.32:8806/user/info/avatar/"
+    const val BASE_AVATAR_URL = "http://106.15.2.32:8806/images/"
 }

@@ -14,5 +14,6 @@ data class Singular (
     val description: String,
     val singularStatus: String,
     val imageList: List<ImageUrl>? = null,
-    val pushDate: String
+    val pushDate: String,
+    val user: User
 ): Parcelable

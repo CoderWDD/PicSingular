@@ -29,6 +29,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.picsingular.App
+import com.example.picsingular.AppAction
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.ui.theme.*
@@ -45,7 +47,6 @@ fun LoginPage(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val loginState = viewModel.viewState
-    Log.e("wgw", "LoginPage: $loginState", )
     // 如果登录成功，就返回
     if (loginState.isLogin) {
         viewModel.intentHandler(LoginViewAction.NavBack(navHostController = navHostController))

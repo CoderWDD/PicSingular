@@ -27,7 +27,7 @@ fun CommentSecondItem(comment: CommentLevelSecond, viewModel: CommentSecondItemV
     viewModel.intentHandler(CommentSecondItemAction.GetUserInfo(comment.userId))
     val commentSecondItemViewState = viewModel.commentSecondItemState
     val userInfo = commentSecondItemViewState.userInfo
-    val avatarUrl = ImageUrlUtil.getAvatarUrl( username = userInfo?.username ?: "")
+    val avatarUrl = ImageUrlUtil.getAvatarUrl( username = userInfo?.username ?: "", fileName = userInfo?.avatar ?: "")
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 8.dp)

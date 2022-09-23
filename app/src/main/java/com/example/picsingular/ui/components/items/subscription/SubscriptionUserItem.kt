@@ -41,7 +41,7 @@ fun SubscriptionUserItem(
     ){
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (avatarImage,usernameText,signatureText,unSubscribeButton,divider) = createRefs()
-            val avatarImageUrl = ImageUrlUtil.getAvatarUrl(userInfo.username)
+            val avatarImageUrl = ImageUrlUtil.getAvatarUrl(userInfo.username, fileName = userInfo.avatar ?: "")
             AsyncImage(
                 model = avatarImageUrl,
                 contentDescription = null,

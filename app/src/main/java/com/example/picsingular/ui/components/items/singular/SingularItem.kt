@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -52,12 +53,10 @@ fun SingularItem(
     onLongClick: () -> Unit = {},
     viewModel: SingularItemViewModel = hiltViewModel()
 ){
-    viewModel.singularUserInfoActionHandler(SingularUserInfoAction.GetUserInfo(singularData.userId))
-    val userInfoState = remember{ viewModel.userInfoState }
     val hasThumbUp = remember { mutableStateOf(hasThumbUp) }
     val hasFavorite = remember { mutableStateOf(hasFavorite) }
     Card (
-        elevation = 8.dp,
+        elevation = 4.dp,
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -71,15 +70,15 @@ fun SingularItem(
                         args = singularData
                     )
                 },
-                onLongClick = {onLongClick()}
+                onLongClick = { onLongClick() }
             )
-
     ) {
+        Log.e("wgw4", "SingularItem: $viewModel $singularData", )
+        val userInfo = remember { singularData.user }
         ConstraintLayout (modifier = Modifier.fillMaxSize()){
-            val (avatar,usernameText,moreIcon,singularImagesContainer,favoriteIcon,thumbUpIcon,singularDescriptionText,pushDataText) = createRefs()
-            val avatarUrl = ImageUrlUtil.getAvatarUrl(userInfoState.userInfo?.username ?: "")
+            val (avatar,usernameText,singularImagesContainer,favoriteIcon,thumbUpIcon,singularDescriptionText,pushDataText) = createRefs()
             AsyncImage(
-                model = avatarUrl,
+                model = ImageUrlUtil.getAvatarUrl(userInfo.username, fileName = userInfo.avatar ?: ""),
                 contentDescription = "avatar of singular",
                 placeholder = painterResource(id = R.drawable.avatar),
                 contentScale = ContentScale.Crop,
@@ -92,7 +91,8 @@ fun SingularItem(
                         start.linkTo(parent.start, margin = 8.dp)
                     },
             )
-            Text(text = userInfoState.userInfo?.username ?: "username", fontSize = 18.sp, fontWeight = FontWeight.W500, modifier = Modifier.constrainAs(usernameText){
+
+            Text(text = userInfo.username, fontSize = 18.sp, fontWeight = FontWeight.W500, modifier = Modifier.constrainAs(usernameText){
                 top.linkTo(avatar.top)
                 bottom.linkTo(avatar.bottom)
                 start.linkTo(avatar.end, margin = 8.dp)
@@ -168,7 +168,7 @@ fun SingularItem(
                         bottom.linkTo(parent.bottom, margin = 12.dp)
                     })
 
-            SingularImagesContainer(singularId = singularData.singularId,imageList = singularData.imageList!!, modifier = Modifier
+            SingularImagesContainer(username = userInfo.username,imageList = singularData.imageList!!, modifier = Modifier
                 .fillMaxWidth()
                 .height(270.dp)
                 .background(Color.Gray)
@@ -180,9 +180,9 @@ fun SingularItem(
 }
 
 @Composable
-fun SingularImagesContainer(singularId: Long,imageList: List<ImageUrl>,modifier: Modifier){
+fun SingularImagesContainer(username: String,imageList: List<ImageUrl>,modifier: Modifier){
     Box(modifier = modifier){
-        val baseImageUrl = ImageUrlUtil.getImageUrl(imageUrl = "", singularId = singularId)
+        val baseImageUrl = ImageUrlUtil.getImageUrl(imageUrl = "", username = username)
         if (imageList.size <= 2){
             AsyncImage(model = baseImageUrl + imageList[0].imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
         }else if (imageList.size == 3){
