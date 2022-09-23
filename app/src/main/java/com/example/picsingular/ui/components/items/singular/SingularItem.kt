@@ -73,7 +73,6 @@ fun SingularItem(
                 onLongClick = { onLongClick() }
             )
     ) {
-        Log.e("wgw4", "SingularItem: $viewModel $singularData", )
         val userInfo = remember { singularData.user }
         ConstraintLayout (modifier = Modifier.fillMaxSize()){
             val (avatar,usernameText,singularImagesContainer,favoriteIcon,thumbUpIcon,singularDescriptionText,pushDataText) = createRefs()
