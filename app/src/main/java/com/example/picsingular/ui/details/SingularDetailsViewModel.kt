@@ -48,6 +48,8 @@ class SingularDetailsViewModel @Inject constructor(
             is SingularDetailsAction.SubLikeCount -> subLikeCount(action.singularId)
             is SingularDetailsAction.FavoriteSingular -> favoriteSingular(action.singularId)
             is SingularDetailsAction.UnFavoriteSingular -> unFavoriteSingular(action.singularId)
+            is SingularDetailsAction.CheckHasSubscribed -> checkHasSubscribed(action.userId)
+            is SingularDetailsAction.CheckHasFavorite -> checkHasFavorite(action.singularId)
         }
     }
 
@@ -96,6 +98,19 @@ class SingularDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun checkHasSubscribed(userId: Long){
+        viewModelScope.launch {
+            singularRepository.checkHasSubscribedUser(userId = userId).collect{res ->
+                //check if has subscribe user at the time of entering the detail page
+                singularDetailsState = if(res.status == HttpConstants.SUCCESS && res.data == true){
+                    singularDetailsState.copy(hasSubscribe = true)
+                }else {
+                    singularDetailsState.copy(hasSubscribe = false)
+                }
+            }
+        }
+    }
+
     private fun unFavoriteSingular(singularId: Long) {
         viewModelScope.launch {
             singularRepository.setSingularToUnfavorite(singularId).collect()
@@ -106,6 +121,10 @@ class SingularDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             singularRepository.setSingularToFavorite(singularId).collect()
         }
+    }
+
+    private fun checkHasFavorite(singularId: Long){
+
     }
 
     private fun subLikeCount(singularId: Long) {
@@ -137,11 +156,13 @@ data class SingularDetailsState(
 sealed class SingularDetailsAction {
     class SubscribeUser(val userId: Long): SingularDetailsAction()
     class UnSubscribeUser(val userId: Long): SingularDetailsAction()
+    class CheckHasSubscribed(val userId: Long): SingularDetailsAction()
     class GetUserInfo(val userId: Long): SingularDetailsAction()
     class GetCommentList(val singularId: Long): SingularDetailsAction()
     class SendComment(val singularId: Long, val content: String): SingularDetailsAction()
-    data class AddLikeCount(val singularId: Long) : SingularDetailsAction()
-    data class SubLikeCount(val singularId: Long) : SingularDetailsAction()
-    data class FavoriteSingular(val singularId: Long) : SingularDetailsAction()
-    data class UnFavoriteSingular(val singularId: Long) : SingularDetailsAction()
+    class AddLikeCount(val singularId: Long) : SingularDetailsAction()
+    class SubLikeCount(val singularId: Long) : SingularDetailsAction()
+    class FavoriteSingular(val singularId: Long) : SingularDetailsAction()
+    class UnFavoriteSingular(val singularId: Long) : SingularDetailsAction()
+    class CheckHasFavorite(val singularId: Long): SingularDetailsAction()
 }

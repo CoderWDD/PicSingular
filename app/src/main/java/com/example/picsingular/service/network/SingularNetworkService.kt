@@ -67,6 +67,9 @@ interface SingularNetworkService {
     @GET("singular/subscribe/all/{page}/{size}")
     suspend fun getSubscribeSingularList(@Path("page") page: Int, @Path("size") size: Int): RetrofitResponseBody<PageDTO<Singular>>
 
+    @GET("singular/hasSubscribed/{userId}")
+    suspend fun getHasSubscribedUser(@Path("userId") userId: Long): RetrofitResponseBody<Boolean>
+
     @POST("singular/read/{singularId}")
     suspend fun readSingular(@Path("singularId") singularId: Long): RetrofitResponseBody<Singular>
 

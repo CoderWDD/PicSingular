@@ -82,6 +82,8 @@ fun SingularDetailPage(
 
     // 获取评论列表
     viewModel.intentHandler(SingularDetailsAction.GetCommentList(singularData.singularId))
+    // 是否已经关注该用户
+    viewModel.intentHandler(SingularDetailsAction.CheckHasSubscribed(singularData.userId))
     Column(modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {

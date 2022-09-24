@@ -81,6 +81,11 @@ class SingularRepository @Inject constructor(private val singularNetworkService:
         emit(unsubscribeRes)
     }.flowOn(Dispatchers.IO)
 
+    fun checkHasSubscribedUser(userId: Long) = flow {
+        val hasSubscribedUser = ApiCallHandler.apiCall { singularNetworkService.getHasSubscribedUser(userId = userId) }
+        emit(hasSubscribedUser)
+    }.flowOn(Dispatchers.IO)
+
     // get subscribed user list
     suspend fun getSubscribedUserList(page: Int, size: Int) = ApiCallHandler.apiCall { singularNetworkService.getSubscribeUserList(page, size) }
 
