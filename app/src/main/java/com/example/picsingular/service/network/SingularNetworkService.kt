@@ -49,6 +49,9 @@ interface SingularNetworkService {
     @POST("singular/unfavorite/{singularId}")
     suspend fun unfavoriteSingular(@Path("singularId") singularId: Long): RetrofitResponseBody<Singular>
 
+    @GET("singular/hasFavorite/{singularId}")
+    suspend fun getHasAddToFavoriteList(@Path("singularId") singularId: Long): RetrofitResponseBody<Boolean>
+
     @GET("singular/favorite/list/{page}/{size}")
     suspend fun getFavoriteSingularList(@Path("page") page: Int, @Path("size") size: Int): RetrofitResponseBody<PageDTO<Singular>>
 

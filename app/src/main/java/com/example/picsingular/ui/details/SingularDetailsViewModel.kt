@@ -113,18 +113,39 @@ class SingularDetailsViewModel @Inject constructor(
 
     private fun unFavoriteSingular(singularId: Long) {
         viewModelScope.launch {
-            singularRepository.setSingularToUnfavorite(singularId).collect()
+            singularRepository.setSingularToUnfavorite(singularId).collect{res ->
+                singularDetailsState = if (res.status == HttpConstants.SUCCESS){
+                    singularDetailsState.copy(hasFavorite = false)
+                }else {
+                    singularDetailsState.copy(hasFavorite = true)
+                }
+            }
         }
     }
 
     private fun favoriteSingular(singularId: Long) {
         viewModelScope.launch {
-            singularRepository.setSingularToFavorite(singularId).collect()
+            singularRepository.setSingularToFavorite(singularId).collect{res ->
+                singularDetailsState = if (res.status == HttpConstants.SUCCESS){
+                    singularDetailsState.copy(hasFavorite = true)
+                }else {
+                    singularDetailsState.copy(hasFavorite = false)
+                }
+            }
         }
     }
 
     private fun checkHasFavorite(singularId: Long){
-
+        viewModelScope.launch {
+            singularRepository.checkHasAddSingularToFavoriteList(singularId = singularId).collect{res ->
+                //check if the current user has add the singular to his favorite list at the time of entering the detail page
+                singularDetailsState = if(res.status == HttpConstants.SUCCESS && res.data == true){
+                    singularDetailsState.copy(hasFavorite = true)
+                }else {
+                    singularDetailsState.copy(hasFavorite = false)
+                }
+            }
+        }
     }
 
     private fun subLikeCount(singularId: Long) {
@@ -149,6 +170,9 @@ data class SingularDetailsState(
     val successGetUserInfo: Boolean = false,
     val errorUserInfo: String = "",
     val hasSubscribe: Boolean = false,
+//    val subscribedUserSuccess: Boolean = false,
+//    val addFavoriteSuccess: Boolean = false,
+    val hasFavorite: Boolean = false,
     val commentIsRefreshing: Boolean = false,
     val commentDataList: Flow<PagingData<CommentLevelFirst>>?,
 )

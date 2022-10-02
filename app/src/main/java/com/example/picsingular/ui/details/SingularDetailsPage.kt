@@ -68,22 +68,25 @@ import com.google.accompanist.pager.rememberPagerState
 fun SingularDetailPage(
     navHostController: NavHostController,
     scaffoldState: ScaffoldState,
-    singularData: Singular?,
+    singularData: Singular,
     viewModel: SingularDetailsViewModel = hiltViewModel()
 ){
-    viewModel.intentHandler(SingularDetailsAction.GetUserInfo(singularData?.userId!!))
     var hasThumbUp by remember { mutableStateOf(false) }
-    var hasFavorite by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    val singularDetailState = viewModel.singularDetailsState
-    val commentDataListPaging = singularDetailState.commentDataList?.collectAsLazyPagingItems()
-    val userInfo = singularDetailState.userInfo
-
     // 获取评论列表
+    Log.e("SingularItem", "SingularItem: $viewModel", )
     viewModel.intentHandler(SingularDetailsAction.GetCommentList(singularData.singularId))
     // 是否已经关注该用户
-    viewModel.intentHandler(SingularDetailsAction.CheckHasSubscribed(singularData.userId))
+    viewModel.intentHandler(
+        SingularDetailsAction.CheckHasSubscribed(
+            singularData.userId
+        )
+    )
+    // 是否已经收藏
+    viewModel.intentHandler(SingularDetailsAction.CheckHasFavorite(singularId = singularData.singularId))
+    viewModel.intentHandler(SingularDetailsAction.GetUserInfo(singularData.userId))
+    Log.e("SingularItem", "SingularItem: $viewModel", )
+
     Column(modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
@@ -94,6 +97,10 @@ fun SingularDetailPage(
             )
         },
     ) {
+        // state 在哪里定义是很有讲究的，如果在最外层定义，就会导致每次state变动，都发起不必要的网络请求
+        val singularDetailState = viewModel.singularDetailsState
+        val commentDataListPaging = singularDetailState.commentDataList?.collectAsLazyPagingItems()
+        val userInfo = singularDetailState.userInfo
         val listState = LazyListState()
         SwipeRefreshList(lazyPagingItems = commentDataListPaging!!, listState = listState){
             // 用户信息 topBar
@@ -109,8 +116,9 @@ fun SingularDetailPage(
                             .clickable {
                                 NavHostUtil.navigateBack(navHostController = navHostController)
                             }
-                            .constrainAs(backIcon) {})
-
+                            .constrainAs(backIcon) {
+                            }
+                        )
                         AsyncImage(
                             model = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "loading...", fileName = userInfo?.avatar ?: ""),
                             contentDescription = null,
@@ -144,7 +152,6 @@ fun SingularDetailPage(
                                     bottom.linkTo(parent.bottom)
                                 },
                             onClick = {
-                                Log.e("wgw", "SingularDetailPage: ${singularDetailState.hasSubscribe}", )
                                 viewModel.intentHandler( if (singularDetailState.hasSubscribe) SingularDetailsAction.UnSubscribeUser(singularData.userId) else SingularDetailsAction.SubscribeUser(singularData.userId))
                             }
                         ) {
@@ -275,24 +282,25 @@ fun SingularDetailPage(
                         }
                     )
 
-                    Icon(imageVector = if (hasFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = null, modifier = Modifier
+                    Icon(imageVector = if (singularDetailState.hasFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = null, modifier = Modifier
                         .padding(start = 8.dp)
                         .size(24.dp)
                         .clickable {
-                            hasFavorite = if (hasFavorite) {
+                            if (singularDetailState.hasFavorite) {
+                                Log.e("wgw", "SingularDetailPage: hasFavorite", )
                                 viewModel.intentHandler(
                                     SingularDetailsAction.UnFavoriteSingular(
                                         singularData.singularId
                                     )
                                 )
-                                false
                             } else {
+                                Log.e("wgw", "SingularDetailPage: has not Favorite", )
+
                                 viewModel.intentHandler(
                                     SingularDetailsAction.FavoriteSingular(
                                         singularData.singularId
                                     )
                                 )
-                                true
                             }
                         }
                         .constrainAs(favoriteIcon) {
@@ -346,7 +354,10 @@ fun SingularDetailPage(
             }else{
                 itemsIndexed(commentDataListPaging){index, item ->
                     if (index != 0){
-                        Divider(modifier = Modifier.height(1.dp).alpha(0.3f).padding(start = 56.dp), color = Color.Gray)
+                        Divider(modifier = Modifier
+                            .height(1.dp)
+                            .alpha(0.3f)
+                            .padding(start = 56.dp), color = Color.Gray)
                     }
                     CommentItem(comment = item!!)
                 }
@@ -354,6 +365,5 @@ fun SingularDetailPage(
         }
     }
 }
-
 
 

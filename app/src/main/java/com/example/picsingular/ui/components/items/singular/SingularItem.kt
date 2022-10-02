@@ -41,6 +41,8 @@ import com.example.picsingular.bean.Singular
 import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.routes.NavRoutes
+import com.example.picsingular.ui.details.SingularDetailsAction
+import com.example.picsingular.ui.details.SingularDetailsViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -51,7 +53,7 @@ fun SingularItem(
     hasFavorite: Boolean = false,
     isSelf: Boolean = false,
     onLongClick: () -> Unit = {},
-    viewModel: SingularItemViewModel = hiltViewModel()
+    viewModel: SingularItemViewModel = hiltViewModel(),
 ){
     val hasThumbUp = remember { mutableStateOf(hasThumbUp) }
     val hasFavorite = remember { mutableStateOf(hasFavorite) }

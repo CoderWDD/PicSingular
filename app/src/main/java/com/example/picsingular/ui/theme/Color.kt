@@ -12,3 +12,12 @@ val Black = Color(0xFF000000)
 val Red600 = Color(0xFFE53935)
 
 val LoginButtonBackground = Color(0x66AF2ED2)
+
+val ButtonBackground = Color(0xFFef5350)
+
+val BorderColor = Color(0xffeeeeee)
+
+val UnfocusedIndicatorColor = Color(0xFFCCCACF)
+val FocusedIndicatorColor = Color(0xFFCCCACF)
+
+val TransparentColor = Color(0x00000000)

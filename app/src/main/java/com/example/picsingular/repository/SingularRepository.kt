@@ -8,16 +8,17 @@ import com.example.picsingular.service.network.SingularNetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import okhttp3.MultipartBody
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SingularRepository @Inject constructor(private val singularNetworkService: SingularNetworkService){
+    // upload image list and return the path in service
+    suspend fun uploadImageList(multipartFileList: MutableList<MultipartBody.Part>) = ApiCallHandler.apiCall { singularNetworkService.uploadImagesToSingular(multipartFileList = multipartFileList) }
+
     // create a singular
-    fun createSingular(singularDTO: SingularDTO) = flow {
-        val createRes = ApiCallHandler.apiCall { singularNetworkService.createSingular(singularDTO) }
-        emit(createRes)
-    }.flowOn(Dispatchers.IO)
+    suspend fun createSingular(singularDTO: SingularDTO) = ApiCallHandler.apiCall { singularNetworkService.createSingular(singularDTO) }
 
     // get all saved status singulars under current user
     suspend fun getSavedSingularList(page: Int, size: Int) = ApiCallHandler.apiCall { singularNetworkService.getSavedSingularList(page, size) }
@@ -66,6 +67,12 @@ class SingularRepository @Inject constructor(private val singularNetworkService:
         emit(setToUnfavorite)
     }.flowOn(Dispatchers.IO)
 
+    // check if current user has add the singular to favorite list
+    fun checkHasAddSingularToFavoriteList(singularId: Long) = flow {
+        val hasAddToFavoriteList = ApiCallHandler.apiCall { singularNetworkService.getHasAddToFavoriteList(singularId = singularId) }
+        emit(hasAddToFavoriteList)
+    }.flowOn(Dispatchers.IO)
+
     // get favorite singular list
     suspend fun getFavoriteSingularList(page: Int, size: Int) = ApiCallHandler.apiCall { singularNetworkService.getFavoriteSingularList(page, size) }
 
@@ -81,6 +88,7 @@ class SingularRepository @Inject constructor(private val singularNetworkService:
         emit(unsubscribeRes)
     }.flowOn(Dispatchers.IO)
 
+    // check if current user has subscribe user
     fun checkHasSubscribedUser(userId: Long) = flow {
         val hasSubscribedUser = ApiCallHandler.apiCall { singularNetworkService.getHasSubscribedUser(userId = userId) }
         emit(hasSubscribedUser)

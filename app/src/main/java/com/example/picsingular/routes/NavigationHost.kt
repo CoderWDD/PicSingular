@@ -24,7 +24,7 @@ import com.example.picsingular.ui.splash.SplashPage
 fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: ScaffoldState){
     NavHost(navController = navHostController, startDestination = NavRoutes.CommunityPage.route, builder = {
         composable(route = NavRoutes.CommunityPage.route, content = { CommunityPage(navHostController = navHostController, scaffoldState = scaffoldState) })
-        composable(route = NavRoutes.Release.route, content = { ReleasePage(navController = navHostController) })
+        composable(route = NavRoutes.Release.route, content = { ReleasePage(navHostController = navHostController) })
         composable(route = NavRoutes.PicBedPage.route, content = { PicBedPage(navController = navHostController) })
 
         composable(route = NavRoutes.Login.route, content = { LoginPage(navHostController = navHostController) })
@@ -37,7 +37,7 @@ fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: Scaff
             },),
         ){
             val singularData = it.arguments?.getString(RouteConstants.SINGULAR_DATA)?.fromJson<Singular>()
-            SingularDetailPage(navHostController = navHostController, scaffoldState = scaffoldState, singularData = singularData)
+            SingularDetailPage(navHostController = navHostController, scaffoldState = scaffoldState, singularData = singularData!!)
         }
 
         composable(route = NavRoutes.UserHomePage.route + "/{${RouteConstants.USER_INFO}}", arguments = listOf(

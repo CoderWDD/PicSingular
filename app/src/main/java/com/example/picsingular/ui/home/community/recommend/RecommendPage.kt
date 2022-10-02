@@ -24,7 +24,6 @@ fun RecommendPage(
     Column(modifier = Modifier.fillMaxSize()) {
         // banner
         // TODO : add banner data from server
-
         val recommendPageState = remember { viewModel.recommendPageState }
         val recommendPageDataList = recommendPageState.pageDataList.collectAsLazyPagingItems()
         val listState = LazyListState()

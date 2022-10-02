@@ -2,6 +2,7 @@ package com.example.picsingular.ui.login
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -52,12 +55,7 @@ fun LoginPage(
         viewModel.intentHandler(LoginViewAction.NavBack(navHostController = navHostController))
     }
 
-    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null, modifier = Modifier
-        .padding(start = 16.dp)
-        .size(32.dp)
-        .clickable {
-            NavHostUtil.navigateBack(navHostController)
-        })
+
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -75,6 +73,7 @@ fun LoginPage(
     ) {
         Text(text = "Hello Again!", color = MaterialTheme.colors.onPrimary, fontSize = H2, fontWeight = FontWeight.Bold)
         Text(text = "welcome back, you've been missed!", color = MaterialTheme.colors.secondaryVariant, fontSize = H4)
+        Spacer(modifier = Modifier.height((24.dp)))
         TextField(
             value = username,
             singleLine = true,
@@ -135,14 +134,15 @@ fun LoginPage(
         Button(onClick = {
             keyboardController?.hide()
             viewModel.intentHandler(LoginViewAction.Login(username = username, password = password))
-        }, modifier = Modifier.fillMaxWidth()) {
+        }, modifier = Modifier
+            .fillMaxWidth()
+            .border(width = 1.dp, color = Color(0x5fbdbdbd), shape = RoundedCornerShape(8.dp))) {
             Text(text = "Login", color = MaterialTheme.colors.onPrimary, fontSize = H4)
         }
+        Spacer(modifier = Modifier.height(4.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
         Text(text = "Forgot Password?", color = MaterialTheme.colors.secondary, fontSize = H4, fontWeight = FontWeight.Bold)
-
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Divider(color = MaterialTheme.colors.secondary, modifier = Modifier
                 .weight(1f)
@@ -156,8 +156,18 @@ fun LoginPage(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
+
+        Button(onClick = { /*TODO*/ }, modifier = Modifier
+            .fillMaxWidth()
+            .border(width = 1.dp, color = Color(0x5fbdbdbd), shape = RoundedCornerShape(8.dp))) {
             Text(text = "Register", color = MaterialTheme.colors.onPrimary, fontSize = H4)
         }
     }
+
+    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null, modifier = Modifier
+        .padding(start = 16.dp)
+        .size(32.dp)
+        .clickable {
+            NavHostUtil.navigateBack(navHostController)
+        })
 }
