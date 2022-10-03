@@ -40,7 +40,7 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
     }
 
     private fun initData(){
-        viewState = viewState.copy(user = App.globalUserInfo.value)
+//        viewState = viewState.copy(user = App.globalUserInfo.value)
     }
 
     private fun navBack(navHostController: NavHostController){
@@ -98,15 +98,15 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
     private fun getUserInfo(){
         viewModelScope.launch {
             userRepository.getUserInfo().collect{res ->
-                if (res.status == HttpConstants.SUCCESS){
+                viewState = if (res.status == HttpConstants.SUCCESS){
                     // 将用户信息更新到本地
                     userRepository.saveUserToLocalStore(res.data)
                     App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = res.data))
                     Log.e("wgw", "getUserInfo: $viewState", )
-                    viewState = viewState.copy(isSuccess = true, isError = false, user = res.data)
+                    viewState.copy(isSuccess = true, isError = false, user = res.data)
                 }else {
                     Log.e("wgw", "getUserInfo fail: $viewState", )
-                    viewState = viewState.copy(isError = true, isSuccess = true, errorMessage = res.message)
+                    viewState.copy(isError = true, isSuccess = true, errorMessage = res.message)
                 }
             }
         }
@@ -134,5 +134,5 @@ sealed class LoginViewAction{
     class UploadAvatar(val avatarPath: String) : LoginViewAction()
     object GetUserInfo : LoginViewAction()
     class NavBack(val navHostController: NavHostController) : LoginViewAction()
-    class InitData() : LoginViewAction()
+    object InitData : LoginViewAction()
 }

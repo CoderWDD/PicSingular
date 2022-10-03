@@ -23,6 +23,7 @@ import com.example.picsingular.ui.login.LoginViewModel
 
 @Composable
 fun HomePage(viewModel: LoginViewModel = hiltViewModel()){
+    // 获取用户信息，保存到全局
     viewModel.intentHandler(LoginViewAction.GetUserInfo)
     MyScaffold()
 }

@@ -108,3 +108,4 @@ data class SingularInfo(
     val category: List<String> = listOf(),
     val imageUrlList: List<String>
 )
+
