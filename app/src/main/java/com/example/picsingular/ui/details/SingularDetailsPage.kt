@@ -124,6 +124,7 @@ fun SingularDetailPage(
                             contentDescription = null,
                             placeholder = painterResource(id = R.drawable.avatar),
                             error = painterResource(id = R.drawable.avatar),
+                            contentScale = ContentScale.FillBounds,
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(shape = CircleShape)

@@ -78,9 +78,9 @@ class SingularDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             singularRepository.subscribeUser(userId).collect{res ->
                 singularDetailsState = if (res.status == HttpConstants.SUCCESS){
-                    singularDetailsState.copy(hasSubscribe = true)
+                    singularDetailsState.copy(hasSubscribe = true, subscribedInfo = res.message, subscribedUserSuccess = true)
                 }else {
-                    singularDetailsState.copy(hasSubscribe = false)
+                    singularDetailsState.copy(hasSubscribe = false, subscribedInfo = res.message, subscribedUserSuccess = false)
                 }
             }
         }
@@ -170,8 +170,10 @@ data class SingularDetailsState(
     val successGetUserInfo: Boolean = false,
     val errorUserInfo: String = "",
     val hasSubscribe: Boolean = false,
-//    val subscribedUserSuccess: Boolean = false,
-//    val addFavoriteSuccess: Boolean = false,
+    val subscribedUserSuccess: Boolean = false,
+    val subscribedInfo: String = "",
+    val addFavoriteSuccess: Boolean = false,
+    val favoriteInfo: String = "",
     val hasFavorite: Boolean = false,
     val commentIsRefreshing: Boolean = false,
     val commentDataList: Flow<PagingData<CommentLevelFirst>>?,

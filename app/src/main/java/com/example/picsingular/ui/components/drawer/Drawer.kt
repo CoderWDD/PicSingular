@@ -97,6 +97,7 @@ fun Drawer(
     val openAlbumLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
+            if (it == null) return@rememberLauncherForActivityResult
             imageUri.value = it
             val imagePath = UriTofilePath.getFilePathByUri(context, it)
             viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))

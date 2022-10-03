@@ -79,14 +79,13 @@ class ReleaseViewModel @Inject constructor(
 
     // upload images to server
     private suspend fun uploadImages(imagesUrlList: List<String>): RetrofitResponseBody<List<String>>{
-        val imageFileList = mutableListOf<MultipartBody.Part>()
+        val multipartBody = MultipartBody.Builder()
         imagesUrlList.forEach{url ->
             val file = File(url)
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-            val imageFile = MultipartBody.Part.createFormData("image", filename = file.name, requestFile)
-            imageFileList.add(imageFile)
+            multipartBody.addFormDataPart("multipartFileList", filename = file.name, requestFile)
         }
-        return singularRepository.uploadImageList(multipartFileList = imageFileList)
+        return singularRepository.uploadImageList(multipartFileList = multipartBody.build())
     }
 }
 

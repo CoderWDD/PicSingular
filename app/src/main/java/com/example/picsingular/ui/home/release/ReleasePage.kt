@@ -1,6 +1,13 @@
 package com.example.picsingular.ui.home.release
 
+import android.Manifest
+import android.content.ContentValues
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,8 +35,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -37,6 +47,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -49,22 +60,77 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.picsingular.R
+import com.example.picsingular.common.utils.images.UriTofilePath
+import com.example.picsingular.ui.components.dialog.PicDialog
+import com.example.picsingular.ui.login.LoginViewAction
 import com.example.picsingular.ui.theme.BorderColor
 import com.example.picsingular.ui.theme.ButtonBackground
 import com.example.picsingular.ui.theme.FocusedIndicatorColor
 import com.example.picsingular.ui.theme.Grey400
 import com.example.picsingular.ui.theme.TransparentColor
 import com.example.picsingular.ui.theme.UnfocusedIndicatorColor
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionRequired
+import com.google.accompanist.permissions.PermissionsRequired
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
 @Composable
-fun ReleasePage(navHostController: NavHostController, viewModel: ReleaseViewModel = hiltViewModel()) {
-    val imageUrlList = mutableListOf<String>()
+fun ReleasePage(
+    navHostController: NavHostController,
+    viewModel: ReleaseViewModel = hiltViewModel()
+) {
+    val imageUrlList = remember {
+        mutableStateListOf<String>()
+    }
     val title = remember { mutableStateOf("") }
     val contentDescription = remember { mutableStateOf("") }
     val releaseState = viewModel.releasePageState
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    val albumPermissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    )
+    PermissionRequired(
+        permissionState = cameraPermissionState,
+        permissionNotGrantedContent = { /*TODO*/ },
+        permissionNotAvailableContent = { /*TODO*/ }) {
+    }
+
+    PermissionsRequired(
+        multiplePermissionsState = albumPermissionsState,
+        permissionsNotGrantedContent = { /*TODO*/ },
+        permissionsNotAvailableContent = { /*TODO*/ }) {
+    }
+
+    // 打开相机的处理
+    val openCameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = {
+            if (it) {
+                imageUrlList.add(cameraUri.toString())
+            }
+        }
+    )
+
+    // 打开相册的处理
+    val openAlbumLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = {
+            if (it == null) return@rememberLauncherForActivityResult
+            val imagePath = UriTofilePath.getFilePathByUri(context, it)
+            imageUrlList.add(imagePath)
+        })
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,7 +158,13 @@ fun ReleasePage(navHostController: NavHostController, viewModel: ReleaseViewMode
             verticalAlignment = Alignment.CenterVertically
         ) {
             imageUrlList.forEach { imageUrl ->
-                AddImageButton(imagePath = imageUrl)
+                AddImageButton(imagePath = imageUrl){
+
+                }
+            }
+            // 添加新图片的按钮
+            AddImageButton(isLast = true){
+                showDialog = true
             }
         }
 
@@ -176,7 +248,11 @@ fun ReleasePage(navHostController: NavHostController, viewModel: ReleaseViewMode
         ) {
             OutlinedButton(
                 onClick = {
-                    val singularInfo = SingularInfo(content = contentDescription.value,title = title.value, imageUrlList = imageUrlList)
+                    val singularInfo = SingularInfo(
+                        content = contentDescription.value,
+                        title = title.value,
+                        imageUrlList = imageUrlList
+                    )
                     viewModel.intentHandler(ReleasePageAction.SaveSingular(singularInfo = singularInfo))
                 },
                 modifier = Modifier.weight(1f, fill = true),
@@ -191,7 +267,11 @@ fun ReleasePage(navHostController: NavHostController, viewModel: ReleaseViewMode
             Spacer(modifier = Modifier.width(24.dp))
             Button(
                 onClick = {
-                    val singularInfo = SingularInfo(content = contentDescription.value,title = title.value, imageUrlList = imageUrlList)
+                    val singularInfo = SingularInfo(
+                        content = contentDescription.value,
+                        title = title.value,
+                        imageUrlList = imageUrlList
+                    )
                     viewModel.intentHandler(ReleasePageAction.ReleaseSingular(singularInfo = singularInfo))
                 },
                 modifier = Modifier.weight(3f, fill = true),
@@ -205,10 +285,37 @@ fun ReleasePage(navHostController: NavHostController, viewModel: ReleaseViewMode
             }
         }
     }
+
+    if (showDialog) PicDialog(
+        onDismiss = {
+            showDialog = !showDialog
+        },
+        onCameraClick = {
+            showDialog = !showDialog
+            if (cameraPermissionState.hasPermission) {
+                cameraUri = context.contentResolver.insert(
+                    if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    else MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                    ContentValues()
+                )
+                openCameraLauncher.launch(cameraUri)
+            } else {
+                cameraPermissionState.launchPermissionRequest()
+            }
+        },
+        onAlbumClick = {
+            showDialog = !showDialog
+            if (albumPermissionsState.allPermissionsGranted) {
+                openAlbumLauncher.launch("image/*")
+            } else {
+                albumPermissionsState.launchMultiplePermissionRequest()
+            }
+        }
+    )
 }
 
 @Composable
-fun AddImageButton(imagePath: String? = null, isLast: Boolean = false) {
+fun AddImageButton(imagePath: String? = null, isLast: Boolean = false, onClick: () -> Unit) {
     ConstraintLayout(
         modifier = Modifier
             .border(
@@ -217,10 +324,12 @@ fun AddImageButton(imagePath: String? = null, isLast: Boolean = false) {
                 shape = RoundedCornerShape(24.dp)
             )
             .size(100.dp)
-            .clickable { }
+            .clickable {
+                onClick.invoke()
+            }
     ) {
         val (addIcon, image) = createRefs()
-        if (!isLast) {
+        if (isLast) {
             Icon(painter = painterResource(id = R.drawable.add),
                 contentDescription = null,
                 modifier = Modifier
