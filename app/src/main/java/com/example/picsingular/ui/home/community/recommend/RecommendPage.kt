@@ -23,10 +23,11 @@ fun RecommendPage(
     navHostController: NavHostController,
     viewModel: RecommendViewModel = hiltViewModel()
 ){
+    // 获取 banner 列表
+    viewModel.intentHandler(RecommendViewAction.GetBannerList)
     Column(modifier = Modifier.fillMaxSize()) {
         // banner
-        // TODO : add banner data from server
-        val recommendPageState = remember { viewModel.recommendPageState }
+        val recommendPageState = viewModel.recommendPageState
         val recommendPageDataList = recommendPageState.pageDataList.collectAsLazyPagingItems()
         val listState = LazyListState()
         SwipeRefreshList(
@@ -34,17 +35,7 @@ fun RecommendPage(
             listState = listState,
         ){
             item {
-                val listBanner = mutableListOf<BannerData>()
-                repeat(5) {
-                    listBanner.add(
-                        BannerData(
-                            title = "Title $it",
-                            imageUrl = "https://api.btstu.cn/sjbz/api.php",
-                            linkUrl = ""
-                        )
-                    )
-                }
-                Banner(listBanner, onClickListener = { linkUrl, title ->
+                Banner(recommendPageState.bannerList, onClickListener = { linkUrl, title ->
                     Log.e("wgw", "CommunityPage: $linkUrl $title")
                 }
                 )

@@ -1,6 +1,7 @@
 package com.example.picsingular.common.di
 
 import com.example.picsingular.common.utils.retrofit.RetrofitClient
+import com.example.picsingular.service.network.BannerNetworkService
 import com.example.picsingular.service.network.CommentNetworkService
 import com.example.picsingular.service.network.SingularNetworkService
 import com.example.picsingular.service.network.UserNetworkService
@@ -24,4 +25,8 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideCommentService(): CommentNetworkService = RetrofitClient.retrofit.create(CommentNetworkService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideBannerService(): BannerNetworkService = RetrofitClient.retrofit.create(BannerNetworkService::class.java)
 }

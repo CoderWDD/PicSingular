@@ -25,9 +25,6 @@ object ApiCallHandler {
 
     private fun <T> castExceptionToRetrofitResponseBody(e: Throwable): RetrofitResponseBody<T> {
         Log.e("wgw", "castExceptionToRetrofitResponseBody: $e", )
-        Log.e("wgw", "${e.message}", )
-        Log.e("wgw", "${e.localizedMessage}", )
-        Log.e("wgw", "${e.cause}", )
         return  when (e) {
             is HttpException -> {
                 val body = Gson().fromJson(e.response()?.errorBody()?.string(), RetrofitResponseBody::class.java)

@@ -10,4 +10,8 @@ object ImageUrlUtil {
     fun getImageUrl(username:String, imageUrl: String): String{
         return HttpConstants.BASE_IMAGE_URL + username + "/" + imageUrl
     }
+
+    fun getBannerUrl(url: String): String{
+        return HttpConstants.BASE_BANNER_URL + url
+    }
 }
