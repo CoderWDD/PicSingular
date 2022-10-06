@@ -11,6 +11,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
+import com.example.picsingular.App
+import com.example.picsingular.AppState
 import com.example.picsingular.ui.components.banner.Banner
 import com.example.picsingular.ui.components.banner.BannerData
 import com.example.picsingular.ui.components.items.singular.SingularItem
@@ -48,7 +50,7 @@ fun RecommendPage(
                 )
             }
             itemsIndexed(recommendPageDataList){ _, item ->
-                SingularItem(singularData = item!!, navHostController = navHostController)  
+                SingularItem(singularData = item!!, navHostController = navHostController, isSelf = item.userId == App.appState.userInfo?.userId)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }

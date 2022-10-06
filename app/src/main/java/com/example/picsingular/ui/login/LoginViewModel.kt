@@ -15,6 +15,8 @@ import com.example.picsingular.common.constants.TokenConstants
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -27,6 +29,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
     var viewState by mutableStateOf(LoginViewState())
         private set
+    private val _viewEvent = Channel<LoginEvent> (capacity = Channel.BUFFERED)
+    val viewEvent = _viewEvent.receiveAsFlow()
     fun intentHandler(action: LoginViewAction){
         when (action){
             is LoginViewAction.Login -> login(username = action.username, password = action.password)
@@ -63,6 +67,8 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
                 }else {
                     viewState.copy(isError = true, errorMessage = res.message)
                 }
+                // 将返回的信息发送给视图
+                _viewEvent.send(LoginEvent.MessageEvent(msg = res.message))
             }
         }
     }
@@ -91,6 +97,7 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
                 }else {
                     viewState.copy(isSuccess = false, isError = true, errorMessage = res.message, isLogin = false)
                 }
+                _viewEvent.send(LoginEvent.MessageEvent(msg = res.message))
             }
         }
     }
@@ -114,7 +121,6 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
 
     private fun saveLoginUser(username: String,password: String){
         // save login user info in local storage sqlite
-
     }
 }
 
@@ -135,4 +141,8 @@ sealed class LoginViewAction{
     object GetUserInfo : LoginViewAction()
     class NavBack(val navHostController: NavHostController) : LoginViewAction()
     object InitData : LoginViewAction()
+}
+
+sealed class LoginEvent{
+    class MessageEvent(val msg: String): LoginEvent()
 }

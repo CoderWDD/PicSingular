@@ -36,7 +36,10 @@ import com.example.picsingular.App
 import com.example.picsingular.AppAction
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.navhost.NavHostUtil
+import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.theme.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -55,7 +58,15 @@ fun LoginPage(
         viewModel.intentHandler(LoginViewAction.NavBack(navHostController = navHostController))
     }
 
+    val snackBarHostState = remember{ SnackbarHostState() }
 
+    LaunchedEffect(Unit){
+        viewModel.viewEvent.collect{event ->
+            when (event){
+                is LoginEvent.MessageEvent -> snackBarHostState.showSnackbar(message = event.msg)
+            }
+        }
+    }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -163,6 +174,9 @@ fun LoginPage(
             Text(text = "Register", color = MaterialTheme.colors.onPrimary, fontSize = H4)
         }
     }
+
+    // 显示event信息
+    SnackBarInfo(snackBarHostState = snackBarHostState)
 
     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null, modifier = Modifier
         .padding(start = 16.dp)

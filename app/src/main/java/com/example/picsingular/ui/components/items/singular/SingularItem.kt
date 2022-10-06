@@ -156,7 +156,7 @@ fun SingularItem(
             }
 
             Text(
-                text = singularData.description,
+                text = singularData.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Start,

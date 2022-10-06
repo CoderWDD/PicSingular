@@ -31,14 +31,17 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -62,6 +65,7 @@ import coil.compose.AsyncImage
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.images.UriTofilePath
 import com.example.picsingular.ui.components.dialog.PicDialog
+import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.login.LoginViewAction
 import com.example.picsingular.ui.theme.BorderColor
 import com.example.picsingular.ui.theme.ButtonBackground
@@ -74,6 +78,7 @@ import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.PermissionsRequired
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -81,9 +86,7 @@ fun ReleasePage(
     navHostController: NavHostController,
     viewModel: ReleaseViewModel = hiltViewModel()
 ) {
-    val imageUrlList = remember {
-        mutableStateListOf<String>()
-    }
+    val imageUrlList = remember { mutableStateListOf<String>() }
     val title = remember { mutableStateOf("") }
     val contentDescription = remember { mutableStateOf("") }
     val releaseState = viewModel.releasePageState
@@ -130,6 +133,24 @@ fun ReleasePage(
             val imagePath = UriTofilePath.getFilePathByUri(context, it)
             imageUrlList.add(imagePath)
         })
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit){
+        viewModel.viewEvent.collect{event ->
+            when (event){
+                is ReleasePageEvent.CleanSingularEvent -> {
+                    // 将页面的信息清空
+                    imageUrlList.clear()
+                    title.value = ""
+                    contentDescription.value = ""
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+                is ReleasePageEvent.MessageEvent -> snackBarHostState.showSnackbar(message = event.msg)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -312,6 +333,8 @@ fun ReleasePage(
             }
         }
     )
+
+    SnackBarInfo(snackBarHostState = snackBarHostState)
 }
 
 @Composable

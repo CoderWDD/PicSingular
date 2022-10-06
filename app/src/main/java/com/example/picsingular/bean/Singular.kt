@@ -11,6 +11,7 @@ data class Singular (
     val likeCount: Int,
     val commentCount: Int,
     val readCount: Int,
+    val title: String,
     val description: String,
     val singularStatus: String,
     val imageList: List<ImageUrl>? = null,
