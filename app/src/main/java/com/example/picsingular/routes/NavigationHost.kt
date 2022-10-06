@@ -18,6 +18,7 @@ import com.example.picsingular.ui.home.community.CommunityPage
 import com.example.picsingular.ui.home.community.subscription.userhome.UserHomePage
 import com.example.picsingular.ui.login.LoginPage
 import com.example.picsingular.ui.home.release.ReleasePage
+import com.example.picsingular.ui.register.RegisterPage
 import com.example.picsingular.ui.splash.SplashPage
 
 @Composable
@@ -49,6 +50,8 @@ fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: Scaff
             val userData = it.arguments?.getString(RouteConstants.USER_INFO)?.fromJson<User>()
             UserHomePage(navHostController = navHostController, userData = userData)
         }
+
+        composable(route = NavRoutes.RegisterPage.route, content = { RegisterPage(navHostController = navHostController)})
     })
 }
 
