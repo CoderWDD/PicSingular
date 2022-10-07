@@ -91,7 +91,7 @@ fun RegisterPage(
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         Text(
             text = "Discover amazing pictures,\n share your images here",
             textAlign = TextAlign.Center,
@@ -111,8 +111,6 @@ fun RegisterPage(
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-
-
 
         TextField(
             value = username,

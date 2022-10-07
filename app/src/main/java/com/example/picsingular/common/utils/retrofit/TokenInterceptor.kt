@@ -23,33 +23,33 @@ class TokenInterceptor : Interceptor{
     override fun intercept(chain: Interceptor.Chain): Response {
         val startTime = SystemClock.elapsedRealtime()
         val request = chain.request()
-        val response = chain.proceed(request)
+
+        // 先添加 token，再放行请求
+        val requestBuilder = request.newBuilder()
+        // 只有非注册登录接口才需要添加token
+        if (TokenConstants.TOKEN.isNotEmpty() && request.url.encodedPath != "/user/login" && request.url.encodedPath != "/user/register"){
+            requestBuilder.addHeader("Authorization", "Bearer " + TokenConstants.TOKEN)
+            Log.e("retrofit", "intercept: headers ${request.headers}", )
+        }
+
+        val newRequest = requestBuilder.build()
+        val response = chain.proceed(newRequest)
         // 如果登录成功，则更新token
         if (response.request.url.encodedPath == "/user/login" && response.isSuccessful){
             val token = response.headers("Authorization")[0]
             TokenConstants.TOKEN = token.substringAfter("Bearer ")
-            Log.e("wgw", "intercept token: ${TokenConstants.TOKEN}")
         }
-        val requestBuilder = request.newBuilder()
-        // 只有非注册登录接口才需要添加token
-        if (TokenConstants.TOKEN.isNotEmpty() && response.request.url.encodedPath != "/user/login" && response.request.url.encodedPath != "/user/register"){
-            requestBuilder.addHeader("Authorization", "Bearer " + TokenConstants.TOKEN)
-            requestBuilder.build()
-
-            Log.e("retrofit", "intercept: headers ${request.headers}", )
-        }
-
 
         val endTime = SystemClock.elapsedRealtime()
         val duration = endTime - startTime
 
         //url
-        val url = request.url.toString()
+        val url = newRequest.url.toString()
         Log.e("retrofit","----------Request Start----------")
-        Log.e("retrofit","" + request.method + " " + url)
+        Log.e("retrofit","" + newRequest.method + " " + url)
 
         //headers
-        val headers = request.headers
+        val headers = newRequest.headers
         var i = 0
         val count = headers.size
         while (i < count) {
@@ -60,7 +60,7 @@ class TokenInterceptor : Interceptor{
         }
 
         //param
-        val requestBody = request.body
+        val requestBody = newRequest.body
         val paramString = readRequestParamString(requestBody)
         if (!TextUtils.isEmpty(paramString)) {
             Log.e("retrofit","Params:$paramString")
@@ -80,7 +80,7 @@ class TokenInterceptor : Interceptor{
         Log.e("retrofit","Time:$duration ms")
         Log.e("retrofit","----------Request End----------")
 
-        return chain.proceed(requestBuilder.build())
+        return response
     }
 
     private fun readRequestParamString(requestBody: RequestBody?): String {

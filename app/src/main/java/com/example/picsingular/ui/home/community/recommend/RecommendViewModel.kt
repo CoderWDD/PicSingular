@@ -43,7 +43,7 @@ class RecommendViewModel @Inject constructor(
         viewModelScope.launch {
             bannerRepository.getBannerList(size = 5).collect{
                 val bannerList = mutableListOf<BannerData>()
-                it.data?.forEach{item->
+                it.data?.forEach{ item ->
                     bannerList.add(BannerData(title = "", imageUrl = ImageUrlUtil.getBannerUrl(item.bannerUrl), linkUrl = item.bannerUrl))
                 }
                 recommendPageState = recommendPageState.copy(bannerList = bannerList)
