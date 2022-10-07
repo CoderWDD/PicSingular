@@ -32,9 +32,7 @@ class RegisterViewModel @Inject constructor(val userRepository: UserRepository) 
     private fun register(username: String, password: String){
         viewModelScope.launch {
             userRepository.register(username = username, password = password).collect{res ->
-                Log.e("wgww", "register: ${res.status} ${HttpConstants.SUCCESS} $res", )
                 if (res.status == HttpConstants.SUCCESS){
-                    Log.e("wgww", "register: ${res.message}", )
                     // 注册成功就返回
                     _viewEvent.send(RegisterEvent.NavBack)
                     _viewEvent.send(RegisterEvent.MessageEvent(res.message))

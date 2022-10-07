@@ -1,5 +1,6 @@
 package com.example.picsingular.ui.home.community.recommend
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.picsingular.common.paging.CommonPager
 import com.example.picsingular.repository.SingularRepository
