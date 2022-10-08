@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class SingularRepository @Inject constructor(private val singularNetworkService: SingularNetworkService){
     // upload image list and return the path in service
-    suspend fun uploadImageList(multipartFileList: MutableList<MultipartBody.Part>) = ApiCallHandler.apiCall { singularNetworkService.uploadImagesToSingular(multipartFileList = multipartFileList) }
+    suspend fun uploadImageList(multipartFileList: MultipartBody) = ApiCallHandler.apiCall { singularNetworkService.uploadImagesToSingular(multipartFileList = multipartFileList) }
 
     // create a singular
     suspend fun createSingular(singularDTO: SingularDTO) = ApiCallHandler.apiCall { singularNetworkService.createSingular(singularDTO) }

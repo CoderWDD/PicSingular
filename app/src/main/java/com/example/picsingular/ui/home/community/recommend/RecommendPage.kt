@@ -11,6 +11,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
+import com.example.picsingular.App
+import com.example.picsingular.AppState
 import com.example.picsingular.ui.components.banner.Banner
 import com.example.picsingular.ui.components.banner.BannerData
 import com.example.picsingular.ui.components.items.singular.SingularItem
@@ -21,10 +23,11 @@ fun RecommendPage(
     navHostController: NavHostController,
     viewModel: RecommendViewModel = hiltViewModel()
 ){
+    // 获取 banner 列表
+    viewModel.intentHandler(RecommendViewAction.GetBannerList)
     Column(modifier = Modifier.fillMaxSize()) {
         // banner
-        // TODO : add banner data from server
-        val recommendPageState = remember { viewModel.recommendPageState }
+        val recommendPageState = viewModel.recommendPageState
         val recommendPageDataList = recommendPageState.pageDataList.collectAsLazyPagingItems()
         val listState = LazyListState()
         SwipeRefreshList(
@@ -32,23 +35,13 @@ fun RecommendPage(
             listState = listState,
         ){
             item {
-                val listBanner = mutableListOf<BannerData>()
-                repeat(5) {
-                    listBanner.add(
-                        BannerData(
-                            title = "Title $it",
-                            imageUrl = "https://api.btstu.cn/sjbz/api.php",
-                            linkUrl = ""
-                        )
-                    )
-                }
-                Banner(listBanner, onClickListener = { linkUrl, title ->
+                Banner(recommendPageState.bannerList, onClickListener = { linkUrl, title ->
                     Log.e("wgw", "CommunityPage: $linkUrl $title")
                 }
                 )
             }
             itemsIndexed(recommendPageDataList){ _, item ->
-                SingularItem(singularData = item!!, navHostController = navHostController)  
+                SingularItem(singularData = item!!, navHostController = navHostController, isSelf = item.userId == App.appState.userInfo?.userId)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }

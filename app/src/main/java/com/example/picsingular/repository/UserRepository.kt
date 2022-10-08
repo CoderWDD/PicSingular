@@ -27,8 +27,8 @@ class UserRepository @Inject constructor(private val userService: UserNetworkSer
 
     fun register(username: String, password: String) = flow {
         val userDTO = UserDTO(username = username, password = password)
-        val loginRes = ApiCallHandler.apiCall { userService.registerUser(userDTO = userDTO) }
-        emit(loginRes)
+        val registerRes = ApiCallHandler.apiCall { userService.registerUser(userDTO = userDTO) }
+        emit(registerRes)
     }.flowOn(Dispatchers.IO)
 
     // logout

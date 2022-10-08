@@ -17,6 +17,7 @@ import com.example.picsingular.repository.SingularRepository
 import com.example.picsingular.repository.UserRepository
 import com.example.picsingular.ui.components.items.singular.SingularUserInfoAction
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,6 +38,9 @@ class SingularDetailsViewModel @Inject constructor(
     var singularDetailsState by mutableStateOf(SingularDetailsState(commentDataList = commentDataList))
         private set
 
+    private val _viewEvent = Channel<SingularDetailsEvent>(capacity = Channel.BUFFERED)
+    val viewEvent = _viewEvent.receiveAsFlow()
+
     fun intentHandler(action: SingularDetailsAction){
         when (action){
             is SingularDetailsAction.GetUserInfo -> getUserInfo(action.userId)
@@ -56,7 +60,9 @@ class SingularDetailsViewModel @Inject constructor(
     private fun sendComment(singularId: Long, content: String) {
         viewModelScope.launch {
             val commentFirstDTO = CommentFirstDTO(content = content, singularId = singularId)
-            commentRepository.addFirstComment(commentFirstDTO).collect{}
+            commentRepository.addFirstComment(commentFirstDTO).collect{
+                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = it.message))
+            }
         }
     }
 
@@ -78,10 +84,11 @@ class SingularDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             singularRepository.subscribeUser(userId).collect{res ->
                 singularDetailsState = if (res.status == HttpConstants.SUCCESS){
-                    singularDetailsState.copy(hasSubscribe = true)
+                    singularDetailsState.copy(hasSubscribe = true, subscribedInfo = res.message, subscribedUserSuccess = true)
                 }else {
-                    singularDetailsState.copy(hasSubscribe = false)
+                    singularDetailsState.copy(hasSubscribe = false, subscribedInfo = res.message, subscribedUserSuccess = false)
                 }
+                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = res.message))
             }
         }
     }
@@ -94,6 +101,7 @@ class SingularDetailsViewModel @Inject constructor(
                 }else {
                     singularDetailsState.copy(hasSubscribe = true)
                 }
+                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = res.message))
             }
         }
     }
@@ -119,6 +127,7 @@ class SingularDetailsViewModel @Inject constructor(
                 }else {
                     singularDetailsState.copy(hasFavorite = true)
                 }
+//                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = res.message))
             }
         }
     }
@@ -131,6 +140,7 @@ class SingularDetailsViewModel @Inject constructor(
                 }else {
                     singularDetailsState.copy(hasFavorite = false)
                 }
+//                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = res.message))
             }
         }
     }
@@ -150,13 +160,17 @@ class SingularDetailsViewModel @Inject constructor(
 
     private fun subLikeCount(singularId: Long) {
         viewModelScope.launch {
-            singularRepository.addSingularLikeCount(singularId).collect()
+            singularRepository.addSingularLikeCount(singularId).collect{
+//                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = it.message))
+            }
         }
     }
 
     private fun addLikeCount(singularId: Long) {
         viewModelScope.launch {
-            singularRepository.removeSingularLikeCount(singularId).collect()
+            singularRepository.removeSingularLikeCount(singularId).collect{
+//                _viewEvent.send(SingularDetailsEvent.MessageEvent(msg = it.message))
+            }
         }
     }
 
@@ -170,8 +184,10 @@ data class SingularDetailsState(
     val successGetUserInfo: Boolean = false,
     val errorUserInfo: String = "",
     val hasSubscribe: Boolean = false,
-//    val subscribedUserSuccess: Boolean = false,
-//    val addFavoriteSuccess: Boolean = false,
+    val subscribedUserSuccess: Boolean = false,
+    val subscribedInfo: String = "",
+    val addFavoriteSuccess: Boolean = false,
+    val favoriteInfo: String = "",
     val hasFavorite: Boolean = false,
     val commentIsRefreshing: Boolean = false,
     val commentDataList: Flow<PagingData<CommentLevelFirst>>?,
@@ -189,4 +205,8 @@ sealed class SingularDetailsAction {
     class FavoriteSingular(val singularId: Long) : SingularDetailsAction()
     class UnFavoriteSingular(val singularId: Long) : SingularDetailsAction()
     class CheckHasFavorite(val singularId: Long): SingularDetailsAction()
+}
+
+sealed class SingularDetailsEvent{
+    class MessageEvent(val msg: String): SingularDetailsEvent()
 }

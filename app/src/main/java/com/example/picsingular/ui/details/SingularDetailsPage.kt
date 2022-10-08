@@ -58,6 +58,7 @@ import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.ui.components.items.comment.CommentItem
 import com.example.picsingular.ui.components.items.singular.SingularUserInfoAction
+import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.components.swipe.SwipeRefreshList
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -85,7 +86,16 @@ fun SingularDetailPage(
     // 是否已经收藏
     viewModel.intentHandler(SingularDetailsAction.CheckHasFavorite(singularId = singularData.singularId))
     viewModel.intentHandler(SingularDetailsAction.GetUserInfo(singularData.userId))
-    Log.e("SingularItem", "SingularItem: $viewModel", )
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit){
+        viewModel.viewEvent.collect{event ->
+            when (event){
+                is SingularDetailsEvent.MessageEvent -> snackBarHostState.showSnackbar(message = event.msg)
+            }
+        }
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -124,6 +134,7 @@ fun SingularDetailPage(
                             contentDescription = null,
                             placeholder = painterResource(id = R.drawable.avatar),
                             error = painterResource(id = R.drawable.avatar),
+                            contentScale = ContentScale.FillBounds,
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(shape = CircleShape)
@@ -241,7 +252,11 @@ fun SingularDetailPage(
 
             // 内容描述
             item {
-                Text(text = singularData.description, fontWeight = W500, fontSize = 24.sp , modifier = Modifier
+                Text(text = singularData.title, fontWeight = W500, fontSize = 24.sp , modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp))
+
+                Text(text = singularData.description, modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp))
 
@@ -287,14 +302,14 @@ fun SingularDetailPage(
                         .size(24.dp)
                         .clickable {
                             if (singularDetailState.hasFavorite) {
-                                Log.e("wgw", "SingularDetailPage: hasFavorite", )
+                                Log.e("wgw", "SingularDetailPage: hasFavorite",)
                                 viewModel.intentHandler(
                                     SingularDetailsAction.UnFavoriteSingular(
                                         singularData.singularId
                                     )
                                 )
                             } else {
-                                Log.e("wgw", "SingularDetailPage: has not Favorite", )
+                                Log.e("wgw", "SingularDetailPage: has not Favorite",)
 
                                 viewModel.intentHandler(
                                     SingularDetailsAction.FavoriteSingular(
@@ -364,6 +379,8 @@ fun SingularDetailPage(
             }
         }
     }
+
+    SnackBarInfo(snackBarHostState = snackBarHostState)
 }
 
 

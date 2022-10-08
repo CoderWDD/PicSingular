@@ -42,12 +42,15 @@ fun Banner(
     onClickListener: (linkUrl: String, title: String) -> Unit
 ) {
     // get the list size and define the pagerState variable, make the initial value to be bannerSize / 2
-    val bannerSize = list?.size ?: 3
+    val bannerSize = list?.size ?: 5
     val pagerState = rememberPagerState(initialPage = bannerSize / 2)
 
     LaunchedEffect(key1 = pagerState.currentPage) {
         delay(timeMillis)
-        pagerState.animateScrollToPage((pagerState.currentPage + 1) % bannerSize)
+        if (!list.isNullOrEmpty()){
+            // list 获取到后，再进行跳转展示
+            pagerState.animateScrollToPage((pagerState.currentPage + 1) % bannerSize)
+        }
 //        pagerState.scrollToPage((pagerState.currentPage + 1) % bannerSize)
     }
 

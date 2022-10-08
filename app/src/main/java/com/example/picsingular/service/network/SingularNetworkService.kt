@@ -9,6 +9,7 @@ import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface SingularNetworkService {
@@ -16,7 +17,7 @@ interface SingularNetworkService {
     suspend fun createSingular(@Body singularDTO: SingularDTO): RetrofitResponseBody<Singular>
 
     @POST("singular/upload")
-    suspend fun uploadImagesToSingular(multipartFileList: MutableList<MultipartBody.Part>): RetrofitResponseBody<List<String>>
+    suspend fun uploadImagesToSingular(@Body multipartFileList: MultipartBody): RetrofitResponseBody<List<String>>
 
 //    展示图片，可以直接将url拼接，用coil直接展示
 //    @GET("/singular/image/{singularId}/{url}")

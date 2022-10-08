@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -36,6 +37,7 @@ import com.example.picsingular.common.utils.images.UriTofilePath
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.routes.NavRoutes
 import com.example.picsingular.ui.components.dialog.PicDialog
+import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.login.LoginViewAction
 import com.example.picsingular.ui.login.LoginViewModel
 import com.google.accompanist.permissions.*
@@ -48,7 +50,7 @@ fun Drawer(
     scaffoldState: ScaffoldState,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    viewModel.intentHandler(LoginViewAction.InitData())
+    viewModel.intentHandler(LoginViewAction.InitData)
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val albumPermissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -97,11 +99,13 @@ fun Drawer(
     val openAlbumLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
+            if (it == null) return@rememberLauncherForActivityResult
             imageUri.value = it
             val imagePath = UriTofilePath.getFilePathByUri(context, it)
             viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))
         })
 
+    val snackBarHostState = remember { SnackbarHostState() }
 
     ConstraintLayout {
         val (column) = createRefs()
@@ -120,26 +124,33 @@ fun Drawer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        // navigate to login page
-                        NavHostUtil.navigateTo(
-                            navHostController = navHostController,
-                            destinationRouteName = NavRoutes.Login.route,
-                            singleTop = true
-                        )
-                        // close drawer
-                        scope.launch {
-                            scaffoldState.drawerState.close()
+                        if (drawerState.isLogin || drawerState.userInfo != null) {
+                            // 弹出提示，表示已经登录
+                            scope.launch { scaffoldState.drawerState.close() }
+                            Toast
+                                .makeText(context, "You have been login.", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            // navigate to login page
+                            NavHostUtil.navigateTo(
+                                navHostController = navHostController,
+                                destinationRouteName = NavRoutes.Login.route,
+                                singleTop = true
+                            )
+                            // close drawer
+                            scope.launch { scaffoldState.drawerState.close() }
                         }
                     }
                     .padding(top = 40.dp, bottom = 20.dp)
                     .clip(shape = RoundedCornerShape(8.dp))
             ) {
                 Spacer(modifier = Modifier.width(20.dp))
-                Log.d("wgw", "Drawer: ${ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "", fileName = userInfo?.avatar ?: "")}")
-
                 // user avatar
                 AsyncImage(
-                    model = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "", fileName = userInfo?.avatar ?: ""),
+                    model = ImageUrlUtil.getAvatarUrl(
+                        username = userInfo?.username ?: "",
+                        fileName = userInfo?.avatar ?: ""
+                    ),
                     placeholder = painterResource(id = R.drawable.avatar),
                     error = painterResource(id = R.drawable.avatar),
                     contentDescription = "User Avatar",
@@ -183,6 +194,11 @@ fun Drawer(
                     DrawerItem(text = textList[i], icon = iconList[i], onClick = {
                         if (i == 3) {
                             viewModel.intentHandler(LoginViewAction.Logout)
+                            // 弹出提示，表示已经登录
+                            scope.launch { scaffoldState.drawerState.close() }
+                            Toast
+                                .makeText(context, "Logout success~.", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     })
                 }
@@ -229,6 +245,7 @@ fun Drawer(
         }
     )
 
+    SnackBarInfo(snackBarHostState = snackBarHostState)
 }
 
 @Composable

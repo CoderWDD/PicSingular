@@ -8,4 +8,5 @@ sealed class NavRoutes(val route: String) {
     object Home : NavRoutes("HomePage")
     object SingularDetailPage: NavRoutes("SingularDetailPage")
     object UserHomePage: NavRoutes("UserHomePage")
+    object RegisterPage: NavRoutes("RegisterPage")
 }
