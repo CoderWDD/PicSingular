@@ -60,6 +60,7 @@ fun Drawer(
     )
     val scope = rememberCoroutineScope()
     val textList = listOf("图床设置", "PicSingular设置", "关于PicSingular", "退出")
+    val pageList = listOf(NavRoutes.PicBedSettingPage.route, NavRoutes.PicSingularSettingPage.route, NavRoutes.AboutPicSingularPage.route)
     val iconList = listOf(
         R.drawable.bed_setting,
         R.drawable.pic_singular_setting,
@@ -200,6 +201,10 @@ fun Drawer(
                             Toast
                                 .makeText(context, "Logout success~.", Toast.LENGTH_SHORT)
                                 .show()
+                        }else{
+                            // 跳转的时候，需要把 drawer 关闭
+                            scope.launch { scaffoldState.drawerState.close() }
+                            NavHostUtil.navigateTo(navHostController = navHostController, destinationRouteName = pageList[i])
                         }
                     })
                 }

@@ -9,4 +9,7 @@ sealed class NavRoutes(val route: String) {
     object SingularDetailPage: NavRoutes("SingularDetailPage")
     object UserHomePage: NavRoutes("UserHomePage")
     object RegisterPage: NavRoutes("RegisterPage")
+    object PicBedSettingPage: NavRoutes("PicBedSettingPage")
+    object PicSingularSettingPage: NavRoutes("PicSingularSettingPage")
+    object AboutPicSingularPage: NavRoutes("AboutPicSingularPage")
 }

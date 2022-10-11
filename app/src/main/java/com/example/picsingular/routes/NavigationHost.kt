@@ -52,6 +52,12 @@ fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: Scaff
         }
 
         composable(route = NavRoutes.RegisterPage.route, content = { RegisterPage(navHostController = navHostController)})
+
+        composable(route = NavRoutes.PicBedSettingPage.route, content = {})
+
+        composable(route = NavRoutes.PicSingularSettingPage.route, content = {})
+
+        composable(route = NavRoutes.AboutPicSingularPage.route, content = {})
     })
 }
 
