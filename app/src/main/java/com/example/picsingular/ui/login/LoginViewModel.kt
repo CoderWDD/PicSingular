@@ -109,11 +109,13 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
                     // 将用户信息更新到本地
                     userRepository.saveUserToLocalStore(res.data)
                     App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = res.data))
+                    // 当获取成功时，将本地登录状态改为已登录
+                    App.AppActionHandler(AppAction.UpdateLoginState(isLogin = true))
                     Log.e("wgw", "getUserInfo: $viewState", )
-                    viewState.copy(isSuccess = true, isError = false, user = res.data)
+                    viewState.copy(isSuccess = true, isError = false, user = res.data, isLogin = true)
                 }else {
                     Log.e("wgw", "getUserInfo fail: $viewState", )
-                    viewState.copy(isError = true, isSuccess = true, errorMessage = res.message)
+                    viewState.copy(isError = true, isSuccess = true, errorMessage = res.message, isLogin = false)
                 }
             }
         }
