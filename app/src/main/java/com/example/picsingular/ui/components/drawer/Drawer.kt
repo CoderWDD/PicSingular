@@ -188,6 +188,9 @@ fun Drawer(
                     .padding(top = 20.dp)
             ) {
                 for (i in textList.indices) {
+                    if (i == 3 && !App.appState.isLogin) {
+                        break
+                    }
                     DrawerItem(text = textList[i], icon = iconList[i], onClick = {
                         if (i == 3) {
                             viewModel.intentHandler(LoginViewAction.Logout)
