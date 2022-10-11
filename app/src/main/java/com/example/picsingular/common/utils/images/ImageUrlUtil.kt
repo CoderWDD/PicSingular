@@ -14,4 +14,8 @@ object ImageUrlUtil {
     fun getBannerUrl(url: String): String{
         return HttpConstants.BASE_BANNER_URL + url
     }
+
+    fun getPicBedImage(url: String): String{
+        return HttpConstants.PIC_BED_IMAGE_URL + url
+    }
 }

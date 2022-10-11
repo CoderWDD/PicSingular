@@ -9,7 +9,7 @@ import androidx.paging.compose.itemsIndexed
 import com.example.picsingular.bean.Singular
 import com.example.picsingular.ui.components.dialog.ChangeStateDialog
 import com.example.picsingular.ui.components.items.singular.SingularItem
-import com.example.picsingular.ui.components.swipe.SwipeRefreshList
+import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
 
 @Composable
 fun SharedPage(
@@ -23,7 +23,7 @@ fun SharedPage(
     var showDialog by remember { mutableStateOf(false) }
     var singularId by remember { mutableStateOf(-1L) }
 
-    SwipeRefreshList(
+    SwipeRefreshListColumn(
         lazyPagingItems = pageDataList,
         listState = listState
     ){

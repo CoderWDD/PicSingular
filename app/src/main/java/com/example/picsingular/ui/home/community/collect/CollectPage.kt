@@ -8,7 +8,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.example.picsingular.bean.Singular
 import com.example.picsingular.ui.components.items.singular.SingularItem
-import com.example.picsingular.ui.components.swipe.SwipeRefreshList
+import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
 
 @Composable
 fun CollectPage(
@@ -19,7 +19,7 @@ fun CollectPage(
     val pageDataList = collectViewState.pagingDataList.collectAsLazyPagingItems()
     val listState = rememberLazyListState()
 
-    SwipeRefreshList(lazyPagingItems = pageDataList, listState = listState){
+    SwipeRefreshListColumn(lazyPagingItems = pageDataList, listState = listState){
         itemsIndexed(pageDataList){_: Int, item: Singular? ->
             SingularItem(singularData = item!!, navHostController = navHostController, hasFavorite = true)
         }

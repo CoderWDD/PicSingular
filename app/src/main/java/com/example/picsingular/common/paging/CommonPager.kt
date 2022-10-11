@@ -30,9 +30,9 @@ fun <T : Any> ViewModel.CommonPager(
             val pageSize = it.loadSize
             // this call will return the result which had handle by ApiExceptionHandler
             val responseRes = serviceCall.invoke(page, pageSize)
-            if (responseRes.status == HttpConstants.SUCCESS) {
+            if (responseRes.status == HttpConstants.SUCCESS && responseRes.data != null) {
                 // if the status is success
-                val data = responseRes.data!!.dataList ?: emptyList()
+                val data = responseRes.data.dataList ?: emptyList()
                 val hasMore = responseRes.data.hasMore
                 return@CommonPagingSource PagingSource.LoadResult.Page(
                     data = data,

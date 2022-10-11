@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -12,11 +11,9 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.example.picsingular.App
-import com.example.picsingular.AppState
 import com.example.picsingular.ui.components.banner.Banner
-import com.example.picsingular.ui.components.banner.BannerData
 import com.example.picsingular.ui.components.items.singular.SingularItem
-import com.example.picsingular.ui.components.swipe.SwipeRefreshList
+import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
 
 @Composable
 fun RecommendPage(
@@ -30,7 +27,7 @@ fun RecommendPage(
         val recommendPageState = viewModel.recommendPageState
         val recommendPageDataList = recommendPageState.pageDataList.collectAsLazyPagingItems()
         val listState = LazyListState()
-        SwipeRefreshList(
+        SwipeRefreshListColumn(
             lazyPagingItems = recommendPageDataList,
             listState = listState,
         ){

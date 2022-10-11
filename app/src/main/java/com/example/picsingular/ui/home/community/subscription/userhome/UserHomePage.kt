@@ -30,7 +30,7 @@ import com.example.picsingular.bean.User
 import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.ui.components.items.singular.SingularItem
-import com.example.picsingular.ui.components.swipe.SwipeRefreshList
+import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
 
 @Composable
 fun UserHomePage(
@@ -44,7 +44,7 @@ fun UserHomePage(
 
     viewModel.intentHandler(UserHomeViewAction.GetSingularListByUserId(userId = userData?.userId ?: -1L))
     Column(modifier = Modifier.fillMaxSize()) {
-        SwipeRefreshList(lazyPagingItems = singularDataList, listState = listState){
+        SwipeRefreshListColumn(lazyPagingItems = singularDataList, listState = listState){
             val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userData?.username ?: "", fileName = userData?.avatar ?: "")
             item {
                 ConstraintLayout(modifier = Modifier

@@ -1,8 +1,10 @@
 package com.example.picsingular.common.di
 
 import com.example.picsingular.common.utils.retrofit.RetrofitClient
+import com.example.picsingular.common.utils.retrofit.RetrofitPicBedClient
 import com.example.picsingular.service.network.BannerNetworkService
 import com.example.picsingular.service.network.CommentNetworkService
+import com.example.picsingular.service.network.PicBedNetworkService
 import com.example.picsingular.service.network.SingularNetworkService
 import com.example.picsingular.service.network.UserNetworkService
 import dagger.Module
@@ -29,4 +31,8 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideBannerService(): BannerNetworkService = RetrofitClient.retrofit.create(BannerNetworkService::class.java)
+
+    @Provides
+    @Singleton
+    fun providePicBedService(): PicBedNetworkService = RetrofitPicBedClient.retrofit.create(PicBedNetworkService::class.java)
 }

@@ -5,17 +5,13 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
@@ -25,22 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
-import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -57,9 +45,8 @@ import com.example.picsingular.bean.Singular
 import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.ui.components.items.comment.CommentItem
-import com.example.picsingular.ui.components.items.singular.SingularUserInfoAction
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
-import com.example.picsingular.ui.components.swipe.SwipeRefreshList
+import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -112,7 +99,7 @@ fun SingularDetailPage(
         val commentDataListPaging = singularDetailState.commentDataList?.collectAsLazyPagingItems()
         val userInfo = singularDetailState.userInfo
         val listState = LazyListState()
-        SwipeRefreshList(lazyPagingItems = commentDataListPaging!!, listState = listState){
+        SwipeRefreshListColumn(lazyPagingItems = commentDataListPaging!!, listState = listState){
             // 用户信息 topBar
             item {
                 Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
