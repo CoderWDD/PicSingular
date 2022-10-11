@@ -188,6 +188,7 @@ fun Drawer(
                     .padding(top = 20.dp)
             ) {
                 for (i in textList.indices) {
+                    // un-render logout when no login
                     if (i == 3 && !App.appState.isLogin) {
                         break
                     }
