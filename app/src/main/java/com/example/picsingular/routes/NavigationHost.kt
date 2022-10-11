@@ -11,6 +11,7 @@ import com.example.picsingular.bean.Singular
 import com.example.picsingular.bean.User
 import com.example.picsingular.common.constants.RouteConstants
 import com.example.picsingular.common.utils.navhost.fromJson
+import com.example.picsingular.ui.about.AboutPicSingularPage
 import com.example.picsingular.ui.details.SingularDetailPage
 import com.example.picsingular.ui.home.HomePage
 import com.example.picsingular.ui.home.picbed.PicBedPage
@@ -18,6 +19,8 @@ import com.example.picsingular.ui.home.community.CommunityPage
 import com.example.picsingular.ui.home.community.subscription.userhome.UserHomePage
 import com.example.picsingular.ui.login.LoginPage
 import com.example.picsingular.ui.home.release.ReleasePage
+import com.example.picsingular.ui.picbedsetting.PicBedSettingPage
+import com.example.picsingular.ui.picsingularsetting.PicSingularSettingPage
 import com.example.picsingular.ui.register.RegisterPage
 import com.example.picsingular.ui.splash.SplashPage
 
@@ -53,11 +56,11 @@ fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: Scaff
 
         composable(route = NavRoutes.RegisterPage.route, content = { RegisterPage(navHostController = navHostController)})
 
-        composable(route = NavRoutes.PicBedSettingPage.route, content = {})
+        composable(route = NavRoutes.PicBedSettingPage.route, content = { PicBedSettingPage(navHostController = navHostController)})
 
-        composable(route = NavRoutes.PicSingularSettingPage.route, content = {})
+        composable(route = NavRoutes.PicSingularSettingPage.route, content = {PicSingularSettingPage(navHostController = navHostController)})
 
-        composable(route = NavRoutes.AboutPicSingularPage.route, content = {})
+        composable(route = NavRoutes.AboutPicSingularPage.route, content = { AboutPicSingularPage(navHostController = navHostController) })
     })
 }
 
