@@ -254,7 +254,7 @@ fun UserInfo(navHostController: NavHostController, viewModel: LoginViewModel = h
                 focusedIndicatorColor = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.high),
             ),
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
+                imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
                 onDone = {

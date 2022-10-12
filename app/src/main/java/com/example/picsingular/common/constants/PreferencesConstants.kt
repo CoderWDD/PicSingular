@@ -12,4 +12,8 @@ object PreferencesConstants {
     const val USER_SIGNATURE = "UserSignature"
 
     const val USER_AVATAR = "UserAvatar"
+
+    const val PIC_BED_BASE_URL = "PicBedBaseUrl"
+
+    const val PIC_BED_TOKEN = "PicBedToken"
 }

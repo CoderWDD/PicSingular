@@ -1,13 +1,14 @@
 package com.example.picsingular.common.utils.retrofit
 
+import android.util.Log
 import com.example.picsingular.common.constants.HttpConstants
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-
+// TODO 动态改变BASE_URL，实现图床切换
 object RetrofitPicBedClient {
-    private const val BASE_URL = HttpConstants.BASE_PIC_BED_URL
+    private var BASE_URL = HttpConstants.BASE_PIC_BED_URL
 
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()

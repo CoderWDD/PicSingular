@@ -55,6 +55,8 @@ import com.example.picsingular.common.utils.images.UriTofilePath
 import com.example.picsingular.ui.components.dialog.PicDialog
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.components.swipe.SwipeRefreshListGrid
+import com.example.picsingular.ui.picbedsetting.PicBedSettingAction
+import com.example.picsingular.ui.picbedsetting.PicBedSettingViewModel
 import com.example.picsingular.ui.theme.ButtonBackground
 import com.example.picsingular.ui.theme.Grey200
 import com.example.picsingular.ui.theme.Grey400
@@ -71,8 +73,12 @@ import kotlin.math.log
 @Composable
 fun PicBedPage(
     navController: NavController,
-    viewModel: PicBedViewModel = hiltViewModel()
+    viewModel: PicBedViewModel = hiltViewModel(),
+    picBedSettingViewModel: PicBedSettingViewModel = hiltViewModel()
 ) {
+
+    // 获取图床设置
+    picBedSettingViewModel.intentHandler(PicBedSettingAction.GetPicBedConfig)
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }

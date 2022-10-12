@@ -47,12 +47,27 @@ class DataStoreManager(appContext: Context, private var dataStore: DataStore<Pre
         }
     }
 
+    // save PicBedConfig
+    suspend fun savePicBedConfig(picBedBaseUrl: String, picBedToken: String){
+        dataStore.edit {
+            it[PIC_BED_URL_KEY] = picBedBaseUrl
+            it[PIC_BED_TOKEN] = picBedToken
+        }
+    }
+
+    // get PicBedBaseUrl
+    fun getPicBedBaseUrl(): Flow<String> = dataStore.data.map { it[PIC_BED_URL_KEY] ?: "还未配置" }.flowOn(Dispatchers.IO)
+
+    // get PicBedToken
+    fun getPicBedToken(): Flow<String> = dataStore.data.map { it[PIC_BED_TOKEN] ?: "还未配置"}.flowOn(Dispatchers.IO)
     companion object {
         val TOKEN_KEY = stringPreferencesKey(PreferencesConstants.TOKEN)
         val USER_ID_KEY = longPreferencesKey(PreferencesConstants.USER_ID)
         val USERNAME_KEY = stringPreferencesKey(PreferencesConstants.USER_NAME)
         val USER_SIGNATURE_KEY = stringPreferencesKey(PreferencesConstants.USER_SIGNATURE)
         val USER_AVATAR_KEY = stringPreferencesKey(PreferencesConstants.USER_AVATAR)
+        val PIC_BED_URL_KEY = stringPreferencesKey(PreferencesConstants.PIC_BED_BASE_URL)
+        val PIC_BED_TOKEN = stringPreferencesKey(PreferencesConstants.PIC_BED_TOKEN)
     }
 
 }

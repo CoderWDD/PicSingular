@@ -9,9 +9,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface PicBedNetworkService {
-    @POST("images/upload")
+    @POST("/images/upload")
     suspend fun uploadImagesToPicBed(@Body multipartFiles: MultipartBody): RetrofitResponseBody<List<String>>
 
-    @GET("list/{page}/{size}")
+    @GET("/list/{page}/{size}")
     suspend fun getPicBedImagesList(@Path("page") page: Int, @Path("size") size: Int): RetrofitResponseBody<PageDTO<String>>
 }

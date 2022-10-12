@@ -16,6 +16,6 @@ object ImageUrlUtil {
     }
 
     fun getPicBedImage(url: String): String{
-        return HttpConstants.PIC_BED_IMAGE_URL + url
+        return HttpConstants.BASE_PIC_BED_URL + url
     }
 }
