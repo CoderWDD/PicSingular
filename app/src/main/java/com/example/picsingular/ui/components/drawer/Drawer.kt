@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,8 +61,12 @@ fun Drawer(
         )
     )
     val scope = rememberCoroutineScope()
-    val textList = listOf("图床设置", "PicSingular设置", "关于PicSingular", "退出")
-    val pageList = listOf(NavRoutes.PicBedSettingPage.route, NavRoutes.PicSingularSettingPage.route, NavRoutes.AboutPicSingularPage.route)
+    val textList = listOf("用户信息", "图床设置", "关于PicSingular", "退出")
+    val pageList = listOf(
+        NavRoutes.UserInfoPage.route,
+        NavRoutes.PicBedSettingPage.route,
+        NavRoutes.AboutPicSingularPage.route
+    )
     val iconList = listOf(
         R.drawable.bed_setting,
         R.drawable.pic_singular_setting,
@@ -174,6 +180,16 @@ fun Drawer(
                         text = if (userInfo?.signature.isNullOrEmpty()) "这个人很懒，什么都没有留下" else userInfo?.signature!!,
                         fontSize = 16.sp
                     )
+//                    var signature by remember { mutableStateOf(if (userInfo?.signature.isNullOrEmpty()) "这个人很懒，什么都没有留下" else userInfo?.signature!!) }
+//                    TextField(value = signature,
+//                        onValueChange = { signature = it },
+//                        modifier = Modifier.fillMaxWidth().height(32.dp),
+//                        leadingIcon = {
+//                            Icon(
+//                                imageVector = Icons.Default.Edit,
+//                                contentDescription = null
+//                            )
+//                        })
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -201,10 +217,13 @@ fun Drawer(
                             Toast
                                 .makeText(context, "Logout success~.", Toast.LENGTH_SHORT)
                                 .show()
-                        }else{
+                        } else {
                             // 跳转的时候，需要把 drawer 关闭
                             scope.launch { scaffoldState.drawerState.close() }
-                            NavHostUtil.navigateTo(navHostController = navHostController, destinationRouteName = pageList[i])
+                            NavHostUtil.navigateTo(
+                                navHostController = navHostController,
+                                destinationRouteName = pageList[i]
+                            )
                         }
                     })
                 }

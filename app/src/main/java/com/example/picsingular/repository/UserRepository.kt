@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import com.example.picsingular.App
 import com.example.picsingular.bean.User
 import com.example.picsingular.bean.dto.UserDTO
+import com.example.picsingular.bean.dto.UserUpdateDTO
 import com.example.picsingular.common.utils.retrofit.ApiCallHandler
 import com.example.picsingular.service.network.UserNetworkService
 import com.example.picsingular.service.network.impl.UserServiceImpl
@@ -44,6 +45,11 @@ class UserRepository @Inject constructor(private val userService: UserNetworkSer
     fun getUserInfo() = flow {
         val userInfo = ApiCallHandler.apiCall { userService.getUserInfo() }
         emit(userInfo)
+    }.flowOn(Dispatchers.IO)
+
+    fun updateUserInfo(userUpdateDTO: UserUpdateDTO) = flow {
+        val user = ApiCallHandler.apiCall { userService.updateUser(userUpdateDTO) }
+        emit(user)
     }.flowOn(Dispatchers.IO)
 
     suspend fun saveUserToLocalStore(user: User?){

@@ -40,6 +40,13 @@ class TokenInterceptor : Interceptor{
             TokenConstants.TOKEN = token.substringAfter("Bearer ")
         }
 
+//        // 如果返回了新的token，就更新
+        if (response.request.url.encodedPath == "/user/update" && response.isSuccessful){
+            val token = response.headers("Authorization")[0]
+            TokenConstants.TOKEN = token.substringAfter("Bearer ")
+        }
+
+
         val endTime = SystemClock.elapsedRealtime()
         val duration = endTime - startTime
 

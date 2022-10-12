@@ -10,12 +10,14 @@ import androidx.navigation.NavHostController
 import com.example.picsingular.App
 import com.example.picsingular.AppAction
 import com.example.picsingular.bean.User
+import com.example.picsingular.bean.dto.UserUpdateDTO
 import com.example.picsingular.common.constants.HttpConstants
 import com.example.picsingular.common.constants.TokenConstants
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -40,6 +42,7 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
             is LoginViewAction.GetUserInfo -> getUserInfo()
             is LoginViewAction.NavBack -> navBack(action.navHostController)
             is LoginViewAction.InitData -> initData()
+            is LoginViewAction.UpdateUserInfo -> updateUserInfo(action.username, action.password, action.signature)
         }
     }
 
@@ -124,6 +127,22 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
     private fun saveLoginUser(username: String,password: String){
         // save login user info in local storage sqlite
     }
+
+    private fun updateUserInfo(username: String, password: String, signature: String){
+        viewModelScope.launch {
+            val userInfo = UserUpdateDTO(username = username, password = password, signature = signature)
+            userRepository.updateUserInfo(userUpdateDTO = userInfo).collect{
+                if (it.status == HttpConstants.SUCCESS){
+                    // 更新本地用户信息及Token
+                    App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = it.data))
+                    App.AppActionHandler(AppAction.UpdateLoginState(isLogin = true))
+                    userRepository.saveUserToLocalStore(user = it.data)
+                    userRepository.saveUserTokenToLocalStore(TokenConstants.TOKEN)
+                }
+                _viewEvent.send(LoginEvent.MessageEvent(msg = it.message))
+            }
+        }
+    }
 }
 
 data class LoginViewState(
@@ -143,6 +162,7 @@ sealed class LoginViewAction{
     object GetUserInfo : LoginViewAction()
     class NavBack(val navHostController: NavHostController) : LoginViewAction()
     object InitData : LoginViewAction()
+    class UpdateUserInfo(val username: String, val password: String, val signature: String): LoginViewAction()
 }
 
 sealed class LoginEvent{

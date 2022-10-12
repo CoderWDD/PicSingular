@@ -10,6 +10,6 @@ sealed class NavRoutes(val route: String) {
     object UserHomePage: NavRoutes("UserHomePage")
     object RegisterPage: NavRoutes("RegisterPage")
     object PicBedSettingPage: NavRoutes("PicBedSettingPage")
-    object PicSingularSettingPage: NavRoutes("PicSingularSettingPage")
+    object UserInfoPage: NavRoutes("UserInfoPage")
     object AboutPicSingularPage: NavRoutes("AboutPicSingularPage")
 }

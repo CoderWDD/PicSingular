@@ -20,9 +20,8 @@ import com.example.picsingular.ui.home.community.subscription.userhome.UserHomeP
 import com.example.picsingular.ui.login.LoginPage
 import com.example.picsingular.ui.home.release.ReleasePage
 import com.example.picsingular.ui.picbedsetting.PicBedSettingPage
-import com.example.picsingular.ui.picsingularsetting.PicSingularSettingPage
+import com.example.picsingular.ui.userinfo.UserInfo
 import com.example.picsingular.ui.register.RegisterPage
-import com.example.picsingular.ui.splash.SplashPage
 
 @Composable
 fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: ScaffoldState){
@@ -58,7 +57,7 @@ fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: Scaff
 
         composable(route = NavRoutes.PicBedSettingPage.route, content = { PicBedSettingPage(navHostController = navHostController)})
 
-        composable(route = NavRoutes.PicSingularSettingPage.route, content = {PicSingularSettingPage(navHostController = navHostController)})
+        composable(route = NavRoutes.UserInfoPage.route, content = {UserInfo(navHostController = navHostController)})
 
         composable(route = NavRoutes.AboutPicSingularPage.route, content = { AboutPicSingularPage(navHostController = navHostController) })
     })

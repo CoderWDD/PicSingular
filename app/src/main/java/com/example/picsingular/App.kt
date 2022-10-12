@@ -24,8 +24,6 @@ import kotlin.coroutines.CoroutineContext
 class App: Application(){
 
     companion object{
-        var globalUserInfo: MutableState<User?> = mutableStateOf(null)
-        var isLogin: MutableState<Boolean> = mutableStateOf(false)
         var appState by mutableStateOf(AppState())
             private set
 
