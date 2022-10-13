@@ -16,8 +16,13 @@ class PicBedTokenInterceptor: Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val startTime = SystemClock.elapsedRealtime()
         val request = chain.request()
-        val newRequest = request.newBuilder()
-            .addHeader("Authorization", "Bearer ${TokenConstants.PIC_BED_TOKEN}").build()
+        val newRequestBuilder = request.newBuilder()
+
+        Log.e("picBed", "intercept: ${TokenConstants.PIC_BED_TOKEN}" )
+        if (TokenConstants.PIC_BED_TOKEN.isNotEmpty()){
+            newRequestBuilder.addHeader("Authorization", "Bearer " + TokenConstants.PIC_BED_TOKEN)
+        }
+        val newRequest = newRequestBuilder.build()
 
         val response = chain.proceed(newRequest)
 

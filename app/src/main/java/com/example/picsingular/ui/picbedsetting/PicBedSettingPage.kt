@@ -76,7 +76,7 @@ fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSet
         var basePicBedUrl by remember { mutableStateOf(viewState.baseUrl) }
 
         TextField(
-            value = basePicBedUrl,
+            value = basePicBedUrl ?: "",
             singleLine = true,
             onValueChange = { basePicBedUrl = it },
             label = {
@@ -104,7 +104,7 @@ fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSet
         var picBedToken by remember { mutableStateOf(viewState.token) }
 
         TextField(
-            value = picBedToken,
+            value = picBedToken ?: "",
             singleLine = true,
             onValueChange = { picBedToken = it },
             label = {
@@ -137,7 +137,7 @@ fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSet
         Button(
             onClick = {
                 keyboardController?.hide()
-                viewModel.intentHandler(PicBedSettingAction.SavePicBedConfig(basePicBedUrl, picBedToken))
+                viewModel.intentHandler(PicBedSettingAction.SavePicBedConfig(basePicBedUrl ?: "", picBedToken ?: ""))
             }, modifier = Modifier
                 .fillMaxWidth()
                 .border(width = 1.dp, color = Color(0x5fbdbdbd), shape = RoundedCornerShape(8.dp))
