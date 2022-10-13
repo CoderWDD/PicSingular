@@ -76,7 +76,6 @@ fun PicBedPage(
     viewModel: PicBedViewModel = hiltViewModel(),
     picBedSettingViewModel: PicBedSettingViewModel = hiltViewModel()
 ) {
-
     // 获取图床设置
     picBedSettingViewModel.intentHandler(PicBedSettingAction.GetPicBedConfig)
     val context = LocalContext.current

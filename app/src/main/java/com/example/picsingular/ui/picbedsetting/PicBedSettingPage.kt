@@ -3,6 +3,7 @@ package com.example.picsingular.ui.picbedsetting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +40,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
+import com.example.picsingular.ui.login.LoginEvent
 import com.example.picsingular.ui.login.LoginViewAction
 import com.example.picsingular.ui.theme.Grey200
 import com.example.picsingular.ui.theme.H4
@@ -54,13 +58,40 @@ import com.example.picsingular.ui.theme.White
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSettingViewModel = hiltViewModel()){
+fun PicBedSettingPage(
+    navHostController: NavHostController,
+    viewModel: PicBedSettingViewModel = hiltViewModel()
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val snackBarHostState = remember{ SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     val viewState = viewModel.viewState
+    var picBedToken by remember { mutableStateOf("") }
+    var basePicBedUrl by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        viewModel.viewEvent.collect { event ->
+            when (event) {
+                is PicBedSettingEvent.MessageEvent -> {
+                    snackBarHostState.showSnackbar(message = event.msg)
+                    // 如果获取到信息了，就更新UI显示
+                    picBedToken = viewState.token ?: ""
+                    basePicBedUrl = viewState.baseUrl ?: ""
+                }
+            }
+        }
+    }
+
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(horizontal = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        .padding(horizontal = 8.dp)
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onPress = {
+                    keyboardController?.hide()
+                }
+            )
+        }, horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         viewModel.intentHandler(PicBedSettingAction.GetPicBedConfig)
         // title
         Text(text = "图床设置", fontSize = 24.sp, fontWeight = FontWeight.W500)
@@ -73,10 +104,9 @@ fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSet
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        var basePicBedUrl by remember { mutableStateOf(viewState.baseUrl) }
 
         TextField(
-            value = basePicBedUrl ?: "",
+            value = basePicBedUrl,
             singleLine = true,
             onValueChange = { basePicBedUrl = it },
             label = {
@@ -101,10 +131,9 @@ fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSet
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        var picBedToken by remember { mutableStateOf(viewState.token) }
 
         TextField(
-            value = picBedToken ?: "",
+            value = picBedToken,
             singleLine = true,
             onValueChange = { picBedToken = it },
             label = {
@@ -137,7 +166,12 @@ fun PicBedSettingPage(navHostController: NavHostController, viewModel: PicBedSet
         Button(
             onClick = {
                 keyboardController?.hide()
-                viewModel.intentHandler(PicBedSettingAction.SavePicBedConfig(basePicBedUrl ?: "", picBedToken ?: ""))
+                viewModel.intentHandler(
+                    PicBedSettingAction.SavePicBedConfig(
+                        basePicBedUrl ?: "",
+                        picBedToken ?: ""
+                    )
+                )
             }, modifier = Modifier
                 .fillMaxWidth()
                 .border(width = 1.dp, color = Color(0x5fbdbdbd), shape = RoundedCornerShape(8.dp))

@@ -6,9 +6,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-// TODO 动态改变BASE_URL，实现图床切换
+// 动态改变BASE_URL，实现图床切换
 object RetrofitPicBedClient {
-    private var BASE_URL = HttpConstants.BASE_PIC_BED_URL
+//    private var BASE_URL = HttpConstants.BASE_PIC_BED_URL
 
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -19,9 +19,15 @@ object RetrofitPicBedClient {
             .build()
     }
 
-    val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
+    var retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(HttpConstants.BASE_PIC_BED_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    fun recreatePicBedRetrofitClient(){
+        retrofit = Retrofit.Builder()
+            .baseUrl(HttpConstants.BASE_PIC_BED_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
