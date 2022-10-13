@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.picsingular.bean.User
 import com.example.picsingular.common.constants.PreferencesConstants
+import com.example.picsingular.common.constants.TokenConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -56,10 +57,10 @@ class DataStoreManager(appContext: Context, private var dataStore: DataStore<Pre
     }
 
     // get PicBedBaseUrl
-    fun getPicBedBaseUrl(): Flow<String> = dataStore.data.map { it[PIC_BED_URL_KEY] ?: "还未配置" }.flowOn(Dispatchers.IO)
+    fun getPicBedBaseUrl(): Flow<String> = dataStore.data.map { it[PIC_BED_URL_KEY] ?: TokenConstants.PIC_BED_TOKEN }.flowOn(Dispatchers.IO)
 
     // get PicBedToken
-    fun getPicBedToken(): Flow<String> = dataStore.data.map { it[PIC_BED_TOKEN] ?: "还未配置"}.flowOn(Dispatchers.IO)
+    fun getPicBedToken(): Flow<String> = dataStore.data.map { it[PIC_BED_TOKEN] ?: TokenConstants.PIC_BED_TOKEN}.flowOn(Dispatchers.IO)
     companion object {
         val TOKEN_KEY = stringPreferencesKey(PreferencesConstants.TOKEN)
         val USER_ID_KEY = longPreferencesKey(PreferencesConstants.USER_ID)
