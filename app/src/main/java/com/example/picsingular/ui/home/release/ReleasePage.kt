@@ -15,6 +15,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,11 +25,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -49,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -122,7 +127,7 @@ fun ReleasePage(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
             if (it) {
-                val imagePath= UriTofilePath.getFilePathByUri(context, cameraUri)
+                val imagePath = UriTofilePath.getFilePathByUri(context, cameraUri)
                 imageUrlList.add(imagePath)
             }
         }
@@ -139,9 +144,9 @@ fun ReleasePage(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit){
-        viewModel.viewEvent.collect{event ->
-            when (event){
+    LaunchedEffect(Unit) {
+        viewModel.viewEvent.collect { event ->
+            when (event) {
                 is ReleasePageEvent.CleanSingularEvent -> {
                     // 将页面的信息清空
                     imageUrlList.clear()
@@ -150,6 +155,7 @@ fun ReleasePage(
                     keyboardController?.hide()
                     focusManager.clearFocus()
                 }
+
                 is ReleasePageEvent.MessageEvent -> snackBarHostState.showSnackbar(message = event.msg)
             }
         }
@@ -173,22 +179,23 @@ fun ReleasePage(
         Text(text = "发布分享", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 //        val scrollableState = remember { RowS}
         // 顶部本地图片预览
-        Row(
+        LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp)
                 .background(color = Color.White)
                 .padding(start = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            imageUrlList.forEach { imageUrl ->
-                AddImageButton(imagePath = imageUrl){
+            items(imageUrlList) { imageUrl ->
+                AddImageButton(imagePath = imageUrl) {
 
                 }
             }
-            // 添加新图片的按钮
-            AddImageButton(isLast = true){
-                showDialog = true
+            item {
+                // 添加新图片的按钮
+                AddImageButton(isLast = true) {
+                    showDialog = true
+                }
             }
         }
 
@@ -346,9 +353,9 @@ fun AddImageButton(imagePath: String? = null, isLast: Boolean = false, onClick: 
             .border(
                 width = 2.dp,
                 color = BorderColor,
-                shape = RoundedCornerShape(24.dp)
             )
             .size(100.dp)
+            .clip(shape = RoundedCornerShape(16.dp))
             .clickable {
                 onClick.invoke()
             }
@@ -372,6 +379,7 @@ fun AddImageButton(imagePath: String? = null, isLast: Boolean = false, onClick: 
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxSize()
+                    .clip(shape = RoundedCornerShape(16.dp))
                     .constrainAs(image) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)

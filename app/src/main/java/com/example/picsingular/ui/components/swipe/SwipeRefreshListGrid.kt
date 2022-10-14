@@ -40,6 +40,7 @@ fun <T : Any> SwipeRefreshListGrid(
             lazyPagingItems.refresh()
         }
     ) {
+        swipeRefreshState.isRefreshing = isRefreshing || lazyPagingItems.loadState.refresh is LoadState.Loading
         LazyVerticalGrid(columns = columns,
             contentPadding = PaddingValues(12.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
