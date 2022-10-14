@@ -74,8 +74,8 @@ class UserRepository @Inject constructor(private val userService: UserNetworkSer
     fun getTokenFromLocalStore(): Flow<String> = dataStoreManager.getToken()
 
     // upload avatar
-    fun uploadUserAvatar(avatar: MultipartBody.Part) = flow{
-        val res = ApiCallHandler.apiCall { userService.uploadAvatar(avatar) }
+    fun uploadUserAvatar(multipartFile: MultipartBody) = flow{
+        val res = ApiCallHandler.apiCall { userService.uploadAvatar(multipartFile) }
         emit(res)
     }.flowOn(Dispatchers.IO)
 }

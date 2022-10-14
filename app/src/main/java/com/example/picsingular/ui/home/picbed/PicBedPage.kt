@@ -106,7 +106,8 @@ fun PicBedPage(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
             if (it) {
-                viewModel.intentHandler(PicBedPageAction.UploadImage(cameraUri.toString()))
+                val imagePath= UriTofilePath.getFilePathByUri(context, cameraUri)
+                viewModel.intentHandler(PicBedPageAction.UploadImage(imagePath))
             }
         }
     )

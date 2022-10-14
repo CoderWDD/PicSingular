@@ -12,7 +12,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -120,7 +122,8 @@ fun ReleasePage(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
             if (it) {
-                imageUrlList.add(cameraUri.toString())
+                val imagePath= UriTofilePath.getFilePathByUri(context, cameraUri)
+                imageUrlList.add(imagePath)
             }
         }
     )
@@ -168,7 +171,7 @@ fun ReleasePage(
     ) {
         // title
         Text(text = "发布分享", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
+//        val scrollableState = remember { RowS}
         // 顶部本地图片预览
         Row(
             modifier = Modifier
@@ -201,7 +204,6 @@ fun ReleasePage(
             value = title.value,
             onValueChange = {
                 title.value = it
-                Log.e("wgw", "ReleasePage: $title")
             },
             placeholder = {
                 Text(

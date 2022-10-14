@@ -17,7 +17,7 @@ object UserServiceImpl {
 
     suspend fun getUserInfo() = userService.getUserInfo()
 
-    suspend fun uploadAvatar(avatar: MultipartBody.Part) = userService.uploadAvatar(avatar = avatar)
+    suspend fun uploadAvatar(multipartFile: MultipartBody) = userService.uploadAvatar(multipartFile = multipartFile)
 
     suspend fun updateUserInfo(userUpdateDTO: UserUpdateDTO) = userService.updateUser(userUpdateDTO = userUpdateDTO)
 

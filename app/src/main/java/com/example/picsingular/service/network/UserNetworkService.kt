@@ -28,9 +28,8 @@ interface UserNetworkService {
     @GET("user/info/{id}")
     suspend fun getUserInfoById(@Path(value = "id") userId: Long): RetrofitResponseBody<User>
 
-    @Multipart
     @POST("user/avatar")
-    suspend fun uploadAvatar(@Part avatar: MultipartBody.Part): RetrofitResponseBody<User>
+    suspend fun uploadAvatar(@Body multipartFile: MultipartBody): RetrofitResponseBody<User>
 
 //    @GET("user/avatar")
 //    suspend fun getAvatar(): RetrofitResponseBody<MultipartBody.Part>

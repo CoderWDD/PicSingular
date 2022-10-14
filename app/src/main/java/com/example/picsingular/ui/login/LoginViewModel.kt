@@ -59,10 +59,11 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
 
     private fun uploadAvatar(avatarPath: String){
         viewModelScope.launch {
+            val multipartBody = MultipartBody.Builder()
             val file = File(avatarPath)
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-            val avatarFile = MultipartBody.Part.createFormData("avatar", filename = file.name, requestFile)
-            userRepository.uploadUserAvatar(avatar = avatarFile).collect{ res ->
+            val avatarFile = multipartBody.addFormDataPart("multipartFile", filename = file.name, requestFile).build()
+            userRepository.uploadUserAvatar(multipartFile = avatarFile).collect{ res ->
                 viewState = if (res.status == HttpConstants.SUCCESS){
                     userRepository.saveUserToLocalStore(res.data)
                     App.AppActionHandler(AppAction.UpdateUserInfo(userInfo = res.data))

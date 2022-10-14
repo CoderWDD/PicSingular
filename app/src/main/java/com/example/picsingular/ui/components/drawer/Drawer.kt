@@ -97,7 +97,8 @@ fun Drawer(
         onResult = {
             if (it) {
                 imageUri.value = cameraUri
-                viewModel.intentHandler(LoginViewAction.UploadAvatar(cameraUri.toString()))
+                val imagePath= UriTofilePath.getFilePathByUri(context, cameraUri)
+                viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))
             }
         }
     )
@@ -180,16 +181,6 @@ fun Drawer(
                         text = if (userInfo?.signature.isNullOrEmpty()) "这个人很懒，什么都没有留下" else userInfo?.signature!!,
                         fontSize = 16.sp
                     )
-//                    var signature by remember { mutableStateOf(if (userInfo?.signature.isNullOrEmpty()) "这个人很懒，什么都没有留下" else userInfo?.signature!!) }
-//                    TextField(value = signature,
-//                        onValueChange = { signature = it },
-//                        modifier = Modifier.fillMaxWidth().height(32.dp),
-//                        leadingIcon = {
-//                            Icon(
-//                                imageVector = Icons.Default.Edit,
-//                                contentDescription = null
-//                            )
-//                        })
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
