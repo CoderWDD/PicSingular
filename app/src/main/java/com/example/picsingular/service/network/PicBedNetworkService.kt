@@ -14,4 +14,7 @@ interface PicBedNetworkService {
 
     @GET("/list/{page}/{size}")
     suspend fun getPicBedImagesList(@Path("page") page: Int, @Path("size") size: Int): RetrofitResponseBody<PageDTO<String>>
+
+    @POST("/images/delete/{imagePath}")
+    suspend fun deleteImage(@Path("imagePath") imagePath: String): RetrofitResponseBody<String>
 }

@@ -24,6 +24,11 @@ class PicBedRepository @Inject constructor(private val picBedNetworkService: Pic
         dataStoreManager.savePicBedConfig(picBedBaseUrl = baseUrl, picBedToken = token)
     }
 
+    suspend fun deleteImage(imagePath: String) = flow {
+        val deleteRes = ApiCallHandler.apiCall { picBedNetworkService.deleteImage(imagePath = imagePath) }
+        emit(deleteRes)
+    }.flowOn(Dispatchers.IO)
+
     fun getPicBedToken() : Flow<String> = dataStoreManager.getPicBedToken()
 
     fun getPicBedBaseUrl(): Flow<String> = dataStoreManager.getPicBedBaseUrl()

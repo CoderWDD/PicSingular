@@ -5,45 +5,33 @@ import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Divider
-import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -52,21 +40,21 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.images.UriTofilePath
+import com.example.picsingular.ui.components.dialog.ChangeStateDialog
+import com.example.picsingular.ui.components.dialog.DeletePicBedImageDialog
 import com.example.picsingular.ui.components.dialog.PicDialog
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.components.swipe.SwipeRefreshListGrid
+import com.example.picsingular.ui.home.community.shared.SharedViewAction
 import com.example.picsingular.ui.picbedsetting.PicBedSettingAction
 import com.example.picsingular.ui.picbedsetting.PicBedSettingViewModel
 import com.example.picsingular.ui.theme.ButtonBackground
 import com.example.picsingular.ui.theme.Grey200
-import com.example.picsingular.ui.theme.Grey400
-import com.example.picsingular.ui.theme.LoginButtonBackground
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.PermissionsRequired
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlin.math.log
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -123,6 +111,17 @@ fun PicBedPage(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var imagePath by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit){
+        viewModel.viewEvent.collect{event ->
+            when (event){
+                is PicBedPageEvent.MessageEvent -> snackBarHostState.showSnackbar(message = event.msg)
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -145,7 +144,10 @@ fun PicBedPage(
 
         SwipeRefreshListGrid(lazyPagingItems = picBedPageList, gridState = gridState){
             items(picBedPageList.itemCount) {position ->
-                PicBedCard(url = picBedPageList[position] ?: "", belong = "")
+                PicBedCard(url = picBedPageList[position] ?: "", belong = "", onLongClick = {
+                    showDeleteDialog = true
+                    imagePath = picBedPageList[position] ?: ""
+                })
             }
         }
     }
@@ -187,7 +189,20 @@ fun PicBedPage(
         }
     )
 
+    if (showDeleteDialog){
+        DeletePicBedImageDialog(
+            onConfirmClick = {
+                showDeleteDialog = false
+                viewModel.intentHandler(PicBedPageAction.DeleteImage(imagePath = imagePath))
+            },
+            onDismissClick = {
+                showDeleteDialog = false
+            },
+            onDismissRequest = {
+                showDeleteDialog = false
+            }
+        )
+    }
+
     SnackBarInfo(snackBarHostState = snackBarHostState)
-
-
 }
