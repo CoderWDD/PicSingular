@@ -1,9 +1,6 @@
 package com.example.picsingular.ui.userinfo
 
 import android.Manifest
-import android.content.ContentValues
-import android.os.Environment
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -11,7 +8,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,7 +43,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -63,18 +58,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.picsingular.App
-import com.example.picsingular.AppState
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.images.UriTofilePath
 import com.example.picsingular.common.utils.navhost.NavHostUtil
-import com.example.picsingular.ui.components.dialog.PicDialog
-import com.example.picsingular.ui.components.inputfield.UserInputTextField
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.login.LoginEvent
 import com.example.picsingular.ui.login.LoginViewAction
 import com.example.picsingular.ui.login.LoginViewModel
-import com.example.picsingular.ui.register.RegisterAction
 import com.example.picsingular.ui.theme.Grey200
 import com.example.picsingular.ui.theme.H4
 import com.example.picsingular.ui.theme.White
@@ -103,7 +94,7 @@ fun UserInfo(navHostController: NavHostController, viewModel: LoginViewModel = h
         contract = ActivityResultContracts.GetContent(),
         onResult = {
             if (it == null) return@rememberLauncherForActivityResult
-            val imagePath = UriTofilePath.getFilePathByUri(context, it)
+            val imagePath = UriTofilePath.getFileAbsolutePath(context, it)
             viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))
         })
 

@@ -5,17 +5,13 @@ import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +28,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -47,7 +42,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -73,7 +67,6 @@ import com.example.picsingular.R
 import com.example.picsingular.common.utils.images.UriTofilePath
 import com.example.picsingular.ui.components.dialog.PicDialog
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
-import com.example.picsingular.ui.login.LoginViewAction
 import com.example.picsingular.ui.theme.BorderColor
 import com.example.picsingular.ui.theme.ButtonBackground
 import com.example.picsingular.ui.theme.FocusedIndicatorColor
@@ -85,7 +78,6 @@ import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.PermissionsRequired
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -127,7 +119,7 @@ fun ReleasePage(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
             if (it) {
-                val imagePath = UriTofilePath.getFilePathByUri(context, cameraUri)
+                val imagePath = UriTofilePath.getFileAbsolutePath(context, cameraUri)
                 imageUrlList.add(imagePath)
             }
         }
@@ -138,7 +130,7 @@ fun ReleasePage(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
             if (it == null) return@rememberLauncherForActivityResult
-            val imagePath = UriTofilePath.getFilePathByUri(context, it)
+            val imagePath = UriTofilePath.getFileAbsolutePath(context, it)
             imageUrlList.add(imagePath)
         })
 

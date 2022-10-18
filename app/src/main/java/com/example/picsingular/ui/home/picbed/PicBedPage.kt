@@ -40,12 +40,10 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.images.UriTofilePath
-import com.example.picsingular.ui.components.dialog.ChangeStateDialog
 import com.example.picsingular.ui.components.dialog.DeletePicBedImageDialog
 import com.example.picsingular.ui.components.dialog.PicDialog
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.components.swipe.SwipeRefreshListGrid
-import com.example.picsingular.ui.home.community.shared.SharedViewAction
 import com.example.picsingular.ui.picbedsetting.PicBedSettingAction
 import com.example.picsingular.ui.picbedsetting.PicBedSettingViewModel
 import com.example.picsingular.ui.theme.ButtonBackground
@@ -94,7 +92,7 @@ fun PicBedPage(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
             if (it) {
-                val imagePath= UriTofilePath.getFilePathByUri(context, cameraUri)
+                val imagePath= UriTofilePath.getFileAbsolutePath(context, cameraUri)
                 viewModel.intentHandler(PicBedPageAction.UploadImage(imagePath))
             }
         }
@@ -105,7 +103,7 @@ fun PicBedPage(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
             if (it == null) return@rememberLauncherForActivityResult
-            val imagePath = UriTofilePath.getFilePathByUri(context, it)
+            val imagePath = UriTofilePath.getFileAbsolutePath(context, it)
             viewModel.intentHandler(PicBedPageAction.UploadImage(imagePath))
         })
 
