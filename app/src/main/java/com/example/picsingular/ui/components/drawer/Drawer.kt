@@ -5,7 +5,6 @@ import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +28,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.picsingular.App
 import com.example.picsingular.R
 import com.example.picsingular.common.utils.images.ImageUrlUtil
@@ -97,7 +93,7 @@ fun Drawer(
         onResult = {
             if (it) {
                 imageUri.value = cameraUri
-                val imagePath= UriTofilePath.getFilePathByUri(context, cameraUri)
+                val imagePath= UriTofilePath.getFileAbsolutePath(context, cameraUri)
                 viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))
             }
         }
@@ -109,7 +105,7 @@ fun Drawer(
         onResult = {
             if (it == null) return@rememberLauncherForActivityResult
             imageUri.value = it
-            val imagePath = UriTofilePath.getFilePathByUri(context, it)
+            val imagePath = UriTofilePath.getFileAbsolutePath(context, it)
             viewModel.intentHandler(LoginViewAction.UploadAvatar(imagePath))
         })
 
