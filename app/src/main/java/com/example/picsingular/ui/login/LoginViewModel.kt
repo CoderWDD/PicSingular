@@ -62,7 +62,7 @@ class LoginViewModel @Inject constructor(private val userRepository: UserReposit
             val multipartBody = MultipartBody.Builder()
             val file = File(avatarPath)
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-            val avatarFile = multipartBody.addFormDataPart("multipartFile", filename = file.name, requestFile).build()
+            val avatarFile = multipartBody.addFormDataPart("avatar", filename = file.name, requestFile).build()
             userRepository.uploadUserAvatar(multipartFile = avatarFile).collect{ res ->
                 viewState = if (res.status == HttpConstants.SUCCESS){
                     userRepository.saveUserToLocalStore(res.data)
