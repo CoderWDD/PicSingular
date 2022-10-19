@@ -60,6 +60,7 @@ fun HomeNavigationHost(navHostController: NavHostController,scaffoldState: Scaff
         composable(route = NavRoutes.UserInfoPage.route, content = {UserInfo(navHostController = navHostController)})
 
         composable(route = NavRoutes.AboutPicSingularPage.route, content = { AboutPicSingularPage(navHostController = navHostController) })
+
     })
 }
 

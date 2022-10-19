@@ -1,18 +1,23 @@
 package com.example.picsingular.ui.home.community.subscription.userhome
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.R
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.style.TextAlign
@@ -31,46 +36,61 @@ import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.navhost.NavHostUtil
 import com.example.picsingular.ui.components.items.singular.SingularItem
 import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
+import com.example.picsingular.ui.theme.Grey200
 
 @Composable
 fun UserHomePage(
     navHostController: NavHostController,
     userData: User?,
     viewModel: UserHomeViewModel = hiltViewModel()
-){
+) {
     val userHomeViewState = viewModel.userHomeViewState
     val singularDataList = userHomeViewState.singularPageDataList.collectAsLazyPagingItems()
     val listState = rememberLazyListState()
 
-    viewModel.intentHandler(UserHomeViewAction.GetSingularListByUserId(userId = userData?.userId ?: -1L))
+    viewModel.intentHandler(
+        UserHomeViewAction.GetSingularListByUserId(
+            userId = userData?.userId ?: -1L
+        )
+    )
     Column(modifier = Modifier.fillMaxSize()) {
-        SwipeRefreshListColumn(lazyPagingItems = singularDataList, listState = listState){
-            val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userData?.username ?: "", fileName = userData?.avatar ?: "")
+        SwipeRefreshListColumn(lazyPagingItems = singularDataList, listState = listState) {
+            val avatarUrl = ImageUrlUtil.getAvatarUrl(
+                username = userData?.username ?: "",
+                fileName = userData?.avatar ?: ""
+            )
             item {
-                ConstraintLayout(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)) {
-                    val (backIcon, avatarImage, usernameText,signatureText) = createRefs()
+                ConstraintLayout(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                ) {
+                    val (backIcon, avatarImage, usernameText, signatureText, background) = createRefs()
 
-                    Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null, modifier = Modifier
-                        .padding(start = 16.dp, top = 8.dp)
-                        .size(32.dp)
-                        .clickable {
-                            NavHostUtil.navigateBack(navHostController = navHostController)
-                        }
-                        .constrainAs(backIcon) {
+                    Icon(imageVector = Icons.Outlined.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 16.dp, top = 8.dp)
+                            .size(32.dp)
+                            .clickable {
+                                NavHostUtil.navigateBack(navHostController = navHostController)
+                            }
+                            .constrainAs(backIcon) {
 //                            start.linkTo(parent.start)
 //                            top.linkTo(parent.top)
-                        })
+                            })
 
-                    AsyncImage(model = avatarUrl, contentDescription = null, contentScale = ContentScale.Crop , modifier = Modifier
-                        .size(120.dp)
-                        .clip(shape = CircleShape)
-                        .constrainAs(avatarImage) {
-                            top.linkTo(parent.top, margin = 24.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        })
+                    AsyncImage(model = avatarUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(shape = CircleShape)
+                            .constrainAs(avatarImage) {
+                                top.linkTo(parent.top, margin = 24.dp)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            })
 
                     Text(
                         text = userData?.username ?: "加载中...",
@@ -91,15 +111,26 @@ fun UserHomePage(
                         textAlign = TextAlign.Center,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.width(260.dp).constrainAs(signatureText) {
-                            top.linkTo(usernameText.bottom, margin = 16.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        })
+                        modifier = Modifier
+                            .width(260.dp)
+                            .constrainAs(signatureText) {
+                                top.linkTo(usernameText.bottom, margin = 16.dp)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            })
                 }
             }
 
-            itemsIndexed(singularDataList){_: Int, item: Singular? ->
+            item {
+                Divider(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .alpha(0.3f)
+                        .padding(horizontal = 4.dp), color = Color.Gray
+                )
+            }
+
+            itemsIndexed(singularDataList) { _: Int, item: Singular? ->
                 SingularItem(singularData = item!!, navHostController = navHostController)
             }
         }

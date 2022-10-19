@@ -40,10 +40,12 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.example.picsingular.App
 import com.example.picsingular.R
 import com.example.picsingular.bean.Singular
 import com.example.picsingular.common.utils.images.ImageUrlUtil
 import com.example.picsingular.common.utils.navhost.NavHostUtil
+import com.example.picsingular.routes.NavRoutes
 import com.example.picsingular.ui.components.items.comment.CommentItem
 import com.example.picsingular.ui.components.snackbar.SnackBarInfo
 import com.example.picsingular.ui.components.swipe.SwipeRefreshListColumn
@@ -58,11 +60,11 @@ fun SingularDetailPage(
     scaffoldState: ScaffoldState,
     singularData: Singular,
     viewModel: SingularDetailsViewModel = hiltViewModel()
-){
+) {
     var hasThumbUp by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     // 获取评论列表
-    Log.e("SingularItem", "SingularItem: $viewModel", )
+    Log.e("SingularItem", "SingularItem: $viewModel")
     viewModel.intentHandler(SingularDetailsAction.GetCommentList(singularData.singularId))
     // 是否已经关注该用户
     viewModel.intentHandler(
@@ -76,48 +78,56 @@ fun SingularDetailPage(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit){
-        viewModel.viewEvent.collect{event ->
-            when (event){
+    LaunchedEffect(Unit) {
+        viewModel.viewEvent.collect { event ->
+            when (event) {
                 is SingularDetailsEvent.MessageEvent -> snackBarHostState.showSnackbar(message = event.msg)
             }
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onPress = {
-                    keyboardController?.hide()
-                }
-            )
-        },
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        keyboardController?.hide()
+                    }
+                )
+            },
     ) {
         // state 在哪里定义是很有讲究的，如果在最外层定义，就会导致每次state变动，都发起不必要的网络请求
         val singularDetailState = viewModel.singularDetailsState
         val commentDataListPaging = singularDetailState.commentDataList?.collectAsLazyPagingItems()
         val userInfo = singularDetailState.userInfo
         val listState = LazyListState()
-        SwipeRefreshListColumn(lazyPagingItems = commentDataListPaging!!, listState = listState){
+        SwipeRefreshListColumn(lazyPagingItems = commentDataListPaging!!, listState = listState) {
             // 用户信息 topBar
             item {
-                Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
                     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                        val (backIcon,avatarIcon,usernameText,subscribeButton) = createRefs()
-                        Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null, modifier = Modifier
-                            .padding(start = 16.dp, top = 8.dp)
-                            .size(32.dp)
-                            .clickable {
-                                NavHostUtil.navigateBack(navHostController = navHostController)
-                            }
-                            .constrainAs(backIcon) {
-                            }
+                        val (backIcon, avatarIcon, usernameText, subscribeButton) = createRefs()
+                        Icon(imageVector = Icons.Outlined.ArrowBack,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(start = 16.dp, top = 8.dp)
+                                .size(32.dp)
+                                .clickable {
+                                    NavHostUtil.navigateBack(navHostController = navHostController)
+                                }
+                                .constrainAs(backIcon) {
+                                }
                         )
                         AsyncImage(
-                            model = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "loading...", fileName = userInfo?.avatar ?: ""),
+                            model = ImageUrlUtil.getAvatarUrl(
+                                username = userInfo?.username ?: "loading...",
+                                fileName = userInfo?.avatar ?: ""
+                            ),
                             contentDescription = null,
                             placeholder = painterResource(id = R.drawable.avatar),
                             error = painterResource(id = R.drawable.avatar),
@@ -125,6 +135,13 @@ fun SingularDetailPage(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(shape = CircleShape)
+                                .clickable {
+                                    NavHostUtil.navigateTo(
+                                        navHostController = navHostController,
+                                        NavRoutes.UserHomePage.route,
+                                        args = userInfo
+                                    )
+                                }
                                 .constrainAs(avatarIcon) {
                                     top.linkTo(backIcon.top, margin = 6.dp)
                                     start.linkTo(backIcon.end, margin = 8.dp)
@@ -132,16 +149,36 @@ fun SingularDetailPage(
                                 }
                         )
 
-                        Text(text = userInfo?.username ?: "loading...", fontSize = 18.sp, fontWeight = FontWeight.W500, modifier = Modifier.constrainAs(usernameText){
-                            start.linkTo(avatarIcon.end, margin = 8.dp)
-                            top.linkTo(backIcon.top, margin = 8.dp)
-                            bottom.linkTo(backIcon.bottom)
-                        })
+                        Text(
+                            text = userInfo?.username ?: "loading...",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.W500,
+                            modifier = Modifier
+                                .clickable {
+                                    NavHostUtil.navigateTo(
+                                        navHostController = navHostController,
+                                        NavRoutes.UserHomePage.route,
+                                        args = userInfo
+                                    )
+                                }
+                                .constrainAs(usernameText) {
+                                    start.linkTo(avatarIcon.end, margin = 8.dp)
+                                    top.linkTo(backIcon.top, margin = 8.dp)
+                                    bottom.linkTo(backIcon.bottom)
+                                })
 
                         Button(
-                            contentPadding = PaddingValues(start = 4.dp, top = 3.dp, end = 4.dp, bottom = 3.dp),
+                            contentPadding = PaddingValues(
+                                start = 4.dp,
+                                top = 3.dp,
+                                end = 4.dp,
+                                bottom = 3.dp
+                            ),
                             shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, if (singularDetailState.hasSubscribe) Color.Gray else Color.Red),
+                            border = BorderStroke(
+                                1.dp,
+                                if (singularDetailState.hasSubscribe) Color.Gray else Color.Red
+                            ),
                             modifier = Modifier
                                 .size(width = 56.dp, height = 24.dp)
                                 .constrainAs(subscribeButton) {
@@ -150,7 +187,11 @@ fun SingularDetailPage(
                                     bottom.linkTo(parent.bottom)
                                 },
                             onClick = {
-                                viewModel.intentHandler( if (singularDetailState.hasSubscribe) SingularDetailsAction.UnSubscribeUser(singularData.userId) else SingularDetailsAction.SubscribeUser(singularData.userId))
+                                viewModel.intentHandler(
+                                    if (singularDetailState.hasSubscribe) SingularDetailsAction.UnSubscribeUser(
+                                        singularData.userId
+                                    ) else SingularDetailsAction.SubscribeUser(singularData.userId)
+                                )
                             }
                         ) {
                             Text(
@@ -169,30 +210,36 @@ fun SingularDetailPage(
             item {
                 val pagerSize = singularData.imageList?.size ?: 0
                 val pagerState = rememberPagerState(0)
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(480.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(480.dp)
+                ) {
                     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                        val (imageContainer,indicatorContainer) = createRefs()
+                        val (imageContainer, indicatorContainer) = createRefs()
                         HorizontalPager(
                             count = pagerSize,
                             state = pagerState,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .constrainAs(imageContainer) {}
-                        ) {page ->
+                        ) { page ->
                             SubcomposeAsyncImage(
-                                model = ImageUrlUtil.getImageUrl(username = userInfo?.username ?: "", imageUrl = singularData.imageList?.get(page)?.imageUrl ?: ""),
+                                model = ImageUrlUtil.getImageUrl(
+                                    username = userInfo?.username ?: "",
+                                    imageUrl = singularData.imageList?.get(page)?.imageUrl ?: ""
+                                ),
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
-                            ){
-                                when(painter.state){
+                            ) {
+                                when (painter.state) {
                                     is AsyncImagePainter.State.Loading -> {
                                         CircularProgressIndicator(
                                             modifier = Modifier.align(Alignment.BottomCenter)
                                         )
                                     }
+
                                     is AsyncImagePainter.State.Error -> {
                                         Image(
                                             painter = painterResource(id = R.drawable.banner_placeholder),
@@ -201,6 +248,7 @@ fun SingularDetailPage(
                                             contentDescription = "Singular Image",
                                         )
                                     }
+
                                     else -> {
                                         SubcomposeAsyncImageContent()
                                     }
@@ -208,20 +256,21 @@ fun SingularDetailPage(
                             }
                         }
                         Box(modifier = Modifier
-                            .constrainAs(indicatorContainer){
+                            .constrainAs(indicatorContainer) {
                                 bottom.linkTo(imageContainer.bottom, margin = 8.dp)
                                 start.linkTo(imageContainer.start)
                                 end.linkTo(imageContainer.end)
                             }
-                        ){
+                        ) {
                             Row(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
-                            ){
-                                for(i in 0 until pagerSize){
+                            ) {
+                                for (i in 0 until pagerSize) {
                                     var indicatorSize by remember { mutableStateOf(4.dp) }
                                     indicatorSize = if (i == pagerState.currentPage) 8.dp else 4.dp
-                                    val indicatorColor = if (i == pagerState.currentPage) Color.Gray else Color.White
+                                    val indicatorColor =
+                                        if (i == pagerState.currentPage) Color.Gray else Color.White
                                     Box(
                                         modifier = Modifier
                                             .clip(CircleShape)
@@ -239,82 +288,102 @@ fun SingularDetailPage(
 
             // 内容描述
             item {
-                Text(text = singularData.title, fontWeight = W500, fontSize = 24.sp , modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp))
+                Text(
+                    text = singularData.title,
+                    fontWeight = W500,
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-                Text(text = singularData.description, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp))
+                Text(
+                    text = singularData.description, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
-                ConstraintLayout(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(24.dp)) {
+                ConstraintLayout(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(24.dp)
+                ) {
                     val (pushDate, likeIcon, favoriteIcon) = createRefs()
-                    Text(text = singularData.pushDate, color = Color.Gray ,fontSize = 14.sp, fontWeight = FontWeight.W500, modifier = Modifier.constrainAs(pushDate){
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start, margin = 16.dp)
-                    })
-
-                    Icon(imageVector = if (hasThumbUp) Icons.Default.ThumbUp else Icons.Outlined.ThumbUp, contentDescription = null, modifier = Modifier
-                        .padding(start = 16.dp)
-                        .size(24.dp)
-                        .clickable {
-                            hasThumbUp = if (hasThumbUp) {
-                                viewModel.intentHandler(
-                                    SingularDetailsAction.AddLikeCount(
-                                        singularData.singularId
-                                    )
-                                )
-                                false
-                            } else {
-                                viewModel.intentHandler(
-                                    SingularDetailsAction.SubLikeCount(
-                                        singularData.singularId
-                                    )
-                                )
-                                true
-                            }
-                        }
-                        .constrainAs(likeIcon) {
+                    Text(
+                        text = singularData.pushDate,
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        modifier = Modifier.constrainAs(pushDate) {
                             top.linkTo(parent.top)
-                            end.linkTo(favoriteIcon.start)
-                        }
+                            bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start, margin = 16.dp)
+                        })
+
+                    Icon(imageVector = if (hasThumbUp) Icons.Default.ThumbUp else Icons.Outlined.ThumbUp,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .size(24.dp)
+                            .clickable {
+                                hasThumbUp = if (hasThumbUp) {
+                                    viewModel.intentHandler(
+                                        SingularDetailsAction.AddLikeCount(
+                                            singularData.singularId
+                                        )
+                                    )
+                                    false
+                                } else {
+                                    viewModel.intentHandler(
+                                        SingularDetailsAction.SubLikeCount(
+                                            singularData.singularId
+                                        )
+                                    )
+                                    true
+                                }
+                            }
+                            .constrainAs(likeIcon) {
+                                top.linkTo(parent.top)
+                                end.linkTo(favoriteIcon.start)
+                            }
                     )
 
-                    Icon(imageVector = if (singularDetailState.hasFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = null, modifier = Modifier
-                        .padding(start = 8.dp)
-                        .size(24.dp)
-                        .clickable {
-                            if (singularDetailState.hasFavorite) {
-                                Log.e("wgw", "SingularDetailPage: hasFavorite",)
-                                viewModel.intentHandler(
-                                    SingularDetailsAction.UnFavoriteSingular(
-                                        singularData.singularId
+                    Icon(imageVector = if (singularDetailState.hasFavorite) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .size(24.dp)
+                            .clickable {
+                                if (singularDetailState.hasFavorite) {
+                                    Log.e("wgw", "SingularDetailPage: hasFavorite")
+                                    viewModel.intentHandler(
+                                        SingularDetailsAction.UnFavoriteSingular(
+                                            singularData.singularId
+                                        )
                                     )
-                                )
-                            } else {
-                                Log.e("wgw", "SingularDetailPage: has not Favorite",)
+                                } else {
+                                    Log.e("wgw", "SingularDetailPage: has not Favorite")
 
-                                viewModel.intentHandler(
-                                    SingularDetailsAction.FavoriteSingular(
-                                        singularData.singularId
+                                    viewModel.intentHandler(
+                                        SingularDetailsAction.FavoriteSingular(
+                                            singularData.singularId
+                                        )
                                     )
-                                )
+                                }
                             }
-                        }
-                        .constrainAs(favoriteIcon) {
-                            top.linkTo(parent.top)
-                            end.linkTo(parent.end, margin = 16.dp)
-                        }
+                            .constrainAs(favoriteIcon) {
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end, margin = 16.dp)
+                            }
                     )
                 }
 
-                Divider(color = Color.Gray, modifier = Modifier
-                    .alpha(0.3f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp))
+                Divider(
+                    color = Color.Gray, modifier = Modifier
+                        .alpha(0.3f)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
             }
 
@@ -322,19 +391,32 @@ fun SingularDetailPage(
                 var commentValue by remember { mutableStateOf("") }
                 // 内容评论
                 TextField(
-                    placeholder = { Text(text = "留下你的评论吧~", color = Color.Black, fontWeight = FontWeight.W500, fontSize = 14.sp, textAlign = TextAlign.Center) },
+                    placeholder = {
+                        Text(
+                            text = "留下你的评论吧~",
+                            color = Color.Black,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    },
                     modifier = Modifier
                         .height(48.dp)
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    leadingIcon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)},
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = null
+                        )
+                    },
                     shape = RoundedCornerShape(16.dp),
                     value = commentValue,
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.high),
                         unfocusedIndicatorColor = MaterialTheme.colors.background
                     ),
-                    onValueChange = {commentValue = it},
+                    onValueChange = { commentValue = it },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
                     ),
@@ -342,7 +424,12 @@ fun SingularDetailPage(
                         onDone = {
                             keyboardController?.hide()
                             // 发送评论
-                            viewModel.intentHandler(SingularDetailsAction.SendComment(singularData.singularId, commentValue))
+                            viewModel.intentHandler(
+                                SingularDetailsAction.SendComment(
+                                    singularData.singularId,
+                                    commentValue
+                                )
+                            )
                             commentValue = ""
                         }
                     )
@@ -351,15 +438,25 @@ fun SingularDetailPage(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            if (commentDataListPaging.itemCount == 0){
-                item {Text(text = "暂无评论~", fontWeight = FontWeight.W500, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }
-            }else{
-                itemsIndexed(commentDataListPaging){index, item ->
-                    if (index != 0){
-                        Divider(modifier = Modifier
-                            .height(1.dp)
-                            .alpha(0.3f)
-                            .padding(start = 56.dp), color = Color.Gray)
+            if (commentDataListPaging.itemCount == 0) {
+                item {
+                    Text(
+                        text = "暂无评论~",
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            } else {
+                itemsIndexed(commentDataListPaging) { index, item ->
+                    if (index != 0) {
+                        Divider(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .alpha(0.3f)
+                                .padding(start = 56.dp), color = Color.Gray
+                        )
                     }
                     CommentItem(comment = item!!)
                 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,7 +53,8 @@ fun SubscriptionUserItem(
                         top.linkTo(parent.top, margin = 8.dp)
                         start.linkTo(parent.start, margin = 8.dp)
                         bottom.linkTo(parent.bottom, margin = 8.dp)
-                    }
+                    },
+                contentScale = ContentScale.FillBounds
             )
             
             Text(
