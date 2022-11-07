@@ -1,5 +1,6 @@
 package com.example.picsingular.ui.components.items.comment
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,10 +28,13 @@ fun CommentItem(
 ) {
     val commentFirstItemState = viewModel.commentFirstItemState
     val userInfo = commentFirstItemState.userInfo
-    val avatarUrl = ImageUrlUtil.getAvatarUrl(username = userInfo?.username ?: "", fileName = userInfo?.avatar ?: "")
+
+    val avatarUrl = ImageUrlUtil.getAvatarUrl(username = comment.username, fileName = comment.avatar)
+    Log.e("wgw", "CommentItem: $avatarUrl", )
+    Log.e("wgw", "CommentItem: ${comment.username}")
 
     // 根据userId获取用户信息
-    viewModel.intentHandler(CommentFirstItemAction.GetUserInfo(comment.userId))
+//    viewModel.intentHandler(CommentFirstItemAction.GetUserInfo(comment.userId))
 
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -37,14 +42,17 @@ fun CommentItem(
         ConstraintLayout {
             val (avatarImage, usernameText, commentText, secondCommentBox) = createRefs()
 
-            ConstraintLayout(modifier = Modifier.fillMaxWidth().clickable {
-                // TODO 弹出回复框
-            }) {
+            ConstraintLayout(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    // TODO 弹出回复框
+                }) {
                 AsyncImage(
                     model = avatarUrl,
                     contentDescription = null,
                     placeholder = painterResource(id = R.drawable.avatar),
                     error = painterResource(id = R.drawable.avatar),
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(32.dp)
                         .clip(shape = CircleShape)
